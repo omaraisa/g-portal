@@ -1,0 +1,9 @@
+.submenu {
+    height: 95vh;
+    width: auto;
+    padding: 1rem;
+    display: flex;
+    align-items:stretch;
+    flex-flow: column wrap;
+    gap: .5rem;
+}

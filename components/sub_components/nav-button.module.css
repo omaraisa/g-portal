@@ -1,0 +1,33 @@
+.navButton {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  align-self: stretch;
+  width: 5rem;
+  color: white;
+  font-size: 2rem;
+  transition: all .3s;
+}
+.navButtonActive {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  align-self: stretch;
+  width: 5rem;
+  color: #0A66C2;
+  border: .2rem solid #0A66C2;
+  background-color: white;
+  font-size: 2rem;
+  transition: all .3s;
+}
+
+
+.navButton:hover {
+  color: yellow;
+  cursor: pointer;
+  text-shadow: 2px 2px #383737;
+}
+
+.iconStyle {
+  font-size: 2rem;
+}
