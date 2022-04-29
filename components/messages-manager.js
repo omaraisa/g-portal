@@ -1,5 +1,6 @@
 export const updateMessageStatus = (targetId,messagesStateRef,setMessages) => {
     const updatedMessages = {...messagesStateRef.current}
+    if(updatedMessages[targetId])
     updatedMessages[targetId].expired = true 
     setMessages(updatedMessages);
   }

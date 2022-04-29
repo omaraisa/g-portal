@@ -1,3 +1,9 @@
+/* Main Issues
+Editing scratch layer
+stop editing
+add zip shp
+reducer switch
+*/
 import React, { Suspense } from "react";
 import Head from "next/head";
 import Header from "../components/header";
@@ -24,7 +30,6 @@ export default function Home() {
   const [messages, setMessages] = useState({});
   const messagesStateRef = useRef();
   messagesStateRef.current = messages;
-  const mapRef = useRef();
   const sendMessage = (message) => {
     setMessagesDone(false);
     setMessages(attachMessage(message, messages));
@@ -34,6 +39,7 @@ export default function Home() {
     layout: defaultLayout,
     map: null,
     view: null,
+    layers: [],
     widgets: {},
   };
   
@@ -69,7 +75,7 @@ export default function Home() {
 //       return state;
 //     }      
     
-//     const showAddLayerWidget = () => {
+//     const goToSubMenu = () => {
 //       console.log("fired")
 //       if(action.targetComponent)
 //       return {...state,layout:{...state.layout,subMenuCurrentComponent:action.targetComponent}}
@@ -87,7 +93,7 @@ export default function Home() {
 //       resizeMenu:LayoutManagement,
 //       toggleMenus:LayoutManagement,
 //       expandLeftMenu : expandLeftMenu,
-//       showAddLayerWidget : showAddLayerWidget,     
+//       goToSubMenu : goToSubMenu,     
 //     }  
     
 //     const defaultAction = () => {
@@ -109,34 +115,33 @@ export default function Home() {
         const view = action.view;
         if (Object.keys(map).length) return { ...state, map, view };
         return state;
-
-      case "sendBackWidget":
-        const widget = action.widget;
-        if (Object.keys(widget).length) {
-          const widgets = { ...state.widgets, ...widget };
-          return { ...state, widgets };
-        }
+        
+        case "sendBackWidget":
+          const widget = action.widget;
+          if (Object.keys(widget).length) {
+            const widgets = { ...state.widgets, ...widget };
+            return { ...state, widgets };
+          }
         return state;
 
       case "goToSubMenu":
       case "changeLayout":
       case "goToPreSubMenu":
-      case "resizeMenu":
-      case "toggleMenus":
-        const LayoutResponse = LayoutManager(state, action);
-        if (LayoutResponse.type === "error") {
-          sendMessage(LayoutResponse);
-          return state;
-        } else return LayoutResponse;
+        case "resizeMenu":
+          case "toggleMenus":
+            const LayoutResponse = LayoutManager(state, action);
+            if (LayoutResponse.type === "error") {
+              sendMessage(LayoutResponse);
+              return state;
+            } else return LayoutResponse;
+            
+            case "updateLayers":
+              const layers = action.layers;
+              return { ...state, layers };
 
       case "expandLeftMenu":
         if (Object.entries(action.newState).length) return action.newState;
         return state;
-
-      case 'showAddLayerWidget':
-        if(action.targetComponent)
-        return {...state,layout:{...state.layout,subMenuCurrentComponent:action.targetComponent}}
-        return state
 
         default:
         sendMessage({
@@ -149,6 +154,8 @@ export default function Home() {
   }
   const [state, dispatch] = useReducer(reducer, appInitials);
   const goToSubMenu = (targetComponent) =>dispatch({ type: "goToSubMenu", targetComponent })
+  const updateLayers = (layers) =>dispatch({ type: "updateLayers", layers })
+  const sendBackMapView= (map, view) =>dispatch({ type: "sendBackMapView", map, view })
 
   useEffect(() => {
     const allMessagesCleared = msgExpirationChecker(messagesStateRef)
@@ -185,7 +192,7 @@ export default function Home() {
 
 
   return (
-    <AppContext.Provider value={{...state,sendMessage,goToSubMenu}}>
+    <AppContext.Provider value={{...state,sendMessage,goToSubMenu,updateLayers,sendBackMapView}}>
     <div className="app" content={"abc"}>
       <Head>
         <title>جي بورتال</title>
@@ -259,13 +266,7 @@ export default function Home() {
             minSize={state.layout.middlePaneMinSize}
           >
             <Suspense fallback={<Loading />}>
-              <MainMap
-                {...state}
-                sendMessage={(message) => sendMessage(message)}
-                sendBackMapView={(map, view) =>
-                  dispatch({ type: "sendBackMapView", map, view })
-                }
-              />
+              <MainMap />
             </Suspense>
             {messagesDone || (
               <MessagesContainer
@@ -314,7 +315,7 @@ export default function Home() {
               sendBackWidget={(widget) =>
                 dispatch({ type: "sendBackWidget", widget })
               }
-              showAddLayerWidget = {(targetComponent) => {dispatch({type:"showAddLayerWidget",targetComponent})}}
+              goToSubMenu = {(targetComponent) => {dispatch({type:"goToSubMenu",targetComponent})}}
             />
           </ReflexElement>
         </ReflexContainer>

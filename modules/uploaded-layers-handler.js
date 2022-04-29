@@ -32,18 +32,19 @@ const createBlobInContainer = async (containerClient, file, uploadName) => {
   const blobClient = containerClient.getBlockBlobClient(uploadName);
   const options = { blobHTTPHeaders: { blobContentType: file.type } };
   await blobClient.uploadBrowserData(file, options);
-  // await blobClient.setMetadata({ UserName: "shubham" });
 };
 
+let XYFeatures = []
 const uploadedLayersHandler = async ({
   layerInfo,
   fileSelected,
   appContext,
   loading,
+  cleanup,
   toggleXYForm,
+  goBack,
 }) => {
   return new Promise((resolve, reject) => {
-      let XYFeatures = []
     const {
       fileName,
       uploadName,
@@ -54,7 +55,6 @@ const uploadedLayersHandler = async ({
     } = layerInfo
     const { map, view, widgets, sendMessage} = appContext
     const layersHandler = {
-      // csv: ()=>csvLayerHandler(),
       json: () => geojsonLayerHandler(),
       geojson: () => geojsonLayerHandler(),
       kml: () => kmlLayerHandler(),
@@ -77,6 +77,7 @@ const uploadedLayersHandler = async ({
       const geojsonLayer = new GeoJSONLayer({
         url: uploadedFile,
         title: fileName,
+        spatialReference: view.spatialReference,
       });
       addLayerToMap(geojsonLayer);
     }
@@ -120,7 +121,7 @@ const uploadedLayersHandler = async ({
       XYFeatures = await processXYData(e.target.result);
         if (await XYFeatures) {
           const XYColumns = Object.keys(await XYFeatures[0]);
-          toggleXYForm(true, XYColumns);
+          toggleXYForm(XYColumns);
         } else {
           sendMessage({
             type: "error",
@@ -193,7 +194,7 @@ const uploadedLayersHandler = async ({
           },
         ],
       };
-      fields.push({
+      fields.unshift({
         name: "ObjectID",
         type: "oid",
       });
@@ -208,6 +209,7 @@ const uploadedLayersHandler = async ({
       });
 
       addLayerToMap(XYLayer);
+      goBack();
     }
 
     let loadChecker;
@@ -219,6 +221,7 @@ const uploadedLayersHandler = async ({
       });
       clearInterval(loadChecker);
       loading(false);
+      cleanup();
     };
 
     const loadingTrigger = {

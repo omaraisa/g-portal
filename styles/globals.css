@@ -169,10 +169,10 @@ i {
 .accordion-button  {
   appearance: none;
   backface-visibility: hidden;
-  background-color: var(--primary);
   border-style: none;
   box-shadow: 1px 2px 3px #575757;
-  color: #fff;
+  color: rgb(53, 53, 53) !important; 
+  background-color: #ebf5ff !important;
   font-weight: 600;
   min-height: 2rem;
   min-width: 10rem;
@@ -193,8 +193,8 @@ i {
 }
 
 .accordion-button:hover {
-  background-color: var(--darkPrimary);
-  color: #fff;
+  background-color: var(--darkPrimary) !important;
+  color: #fff !important;
   /* box-shadow: rgba(0, 0, 0, 0.05) 0 5px 30px, rgba(0, 0, 0, 0.05) 0 1px 4px; */
   opacity: 1;
   transform: translateY(0);
@@ -448,7 +448,7 @@ input:checked + .switch-lable:after {
   width: 2rem;
   height: 2rem;
   background-color: #6d6d6d;
-  transform: translateY(-50%);
+  transform: translateY(-5%);
   border-radius: 50%;
   cursor: pointer;
   transition: 0.2s ease transform, 0.2s ease background-color,
@@ -490,7 +490,7 @@ input:checked + .switch-lable:after {
 }
 
 .tick-label:active {
-  transform: translateY(-50%) scale(0.6);
+  transform: scale(0.6);
 }
 
 #tick_mark {
@@ -737,11 +737,28 @@ textarea {
   padding-bottom: 1rem;
 }
 
+.flex-row-container {
+  display: flex;
+  flex-flow: row nowrap;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 1rem;
+  width: 100%;
+  padding-bottom: 1rem;
+}
+
 .leftBtn {
   text-align: left;
 }
 .leftBtn i {
   padding-right: 1rem;
+}
+
+.rightBtn {
+  text-align: right;
+}
+.rightBtn i {
+  padding-left: 1rem;
 }
 
 .select:focus , .select:hover, .input-number:hover ,.input-number:focus, .inputText:hover ,.inputText:focus{

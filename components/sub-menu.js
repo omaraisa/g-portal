@@ -17,6 +17,7 @@ import Loading from "./sub_components/loading";
 const Print = React.lazy(() => import('./widgets/print'))
 const Editor = React.lazy(() => import('./widgets/editor'))
 const Basemap = React.lazy(() => import('./widgets/basemap'))
+const SelectFeatures = React.lazy(() => import('./submenu_components/select-features'))
 
 const components = {
   Pane: Pane,
@@ -31,6 +32,7 @@ const components = {
   AddKMLLayer:AddKMLLayer,
   AddGeoJSONLayer:AddGeoJSONLayer,
   AddUploadedLayer:AddUploadedLayer,
+  SelectFeatures:SelectFeatures,
   Bookmarks:Bookmarks,
   Pane4: HTML_ELEMENTS_TEMPLATES,
   GPortalInfo:GPortalInfo,
