@@ -18,6 +18,9 @@ const Print = React.lazy(() => import('./widgets/print'))
 const Editor = React.lazy(() => import('./widgets/editor'))
 const Basemap = React.lazy(() => import('./widgets/basemap'))
 const SelectFeatures = React.lazy(() => import('./submenu_components/select-features'))
+const Query = React.lazy(() => import('./widgets/query'))
+const IntersectionAnalysis = React.lazy(() => import('./widgets/intersection-analysis'))
+
 
 const components = {
   Pane: Pane,
@@ -33,6 +36,8 @@ const components = {
   AddGeoJSONLayer:AddGeoJSONLayer,
   AddUploadedLayer:AddUploadedLayer,
   SelectFeatures:SelectFeatures,
+  Query:Query,
+  IntersectionAnalysis:IntersectionAnalysis,
   Bookmarks:Bookmarks,
   Pane4: HTML_ELEMENTS_TEMPLATES,
   GPortalInfo:GPortalInfo,

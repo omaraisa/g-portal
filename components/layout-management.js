@@ -12,7 +12,7 @@ export const defaultLayout = {
   middlePaneFlex: 0.6,
   middlePaneMinSize: 600,
   animationOn: false,
-  subMenuCurrentComponent: "SelectFeatures",
+  subMenuCurrentComponent: "Pane4",
 };
 
 export const LayoutManager = (state,action) => {

@@ -768,3 +768,6 @@ textarea {
   transition-duration: .7s;
 }
 
+.info-text {
+  font-size: 1.2rem;
+}

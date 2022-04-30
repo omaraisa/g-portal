@@ -1,0 +1,16 @@
+.toolsDiv {
+  display: flex;
+  flex-flow: column nowrap;
+  align-items: stretch;
+  justify-content: flex-start;
+  gap: 1rem;
+  width: 100%;
+  padding-bottom: 1rem;
+}
+
+.toolsDiv > b , .toolsDiv > ul > li {
+  cursor: pointer;
+} 
+.toolsDiv > ul > li:hover {
+  font-weight: bold;
+} 

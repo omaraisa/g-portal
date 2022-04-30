@@ -16,6 +16,7 @@ export default function Query() {
   const [state, setState] = useState({
     targetLayer: null,
     queryResultLayer: null,
+    resultLayerParameters:null,
     fieldsNames: [],
     layersArray: [],
     inputMethod: "manual",
@@ -31,16 +32,13 @@ export default function Query() {
 
   function prepareQueryParams(state) {
     const layerIndex = layerSelector.current.value;
-    const currentLayer = state.layersArray[layerIndex];
-    const fieldsNames = currentLayer.fields.map((field) => field.name);
-    view.whenLayerView(currentLayer).then(function (targetLayer) {
-      const fetchAllFeaturesQuery = {
-        outFields: ["*"],
-        returnGeometry: false,
-        // where: "",
-        geometry: targetLayer.layer.fullExtent,
-      };
-      
+    const targetLayer = state.layersArray[layerIndex];
+    const fieldsNames = targetLayer.fields.map((field) => field.name);
+    const fetchAllFeaturesQuery = {
+      outFields: ["*"],
+      returnGeometry: false,
+      where: "",
+    };
       targetLayer.queryFeatures(fetchAllFeaturesQuery).then(function (result) {
       setState({
         ...state,
@@ -52,7 +50,6 @@ export default function Query() {
       sendErrorMessage("تعذر جمع البيانات عن الطبقة المختارة");
       console.log("Query Error", error);
     });
-  })
   }
 
   function toggleInputMode(state, mode) {
@@ -124,7 +121,7 @@ export default function Query() {
         },
       },
     };
-    const querySymbol = symbols[state.targetLayer.layer.geometryType];
+    const querySymbol = symbols[state.targetLayer.geometryType];
     const renderer = {
       type: "simple",
       symbol: querySymbol,
@@ -138,7 +135,7 @@ export default function Query() {
       });
       return queryGraphic;
     });
-    const fieldInfos = state.targetLayer.layer.fields.map((field) => {
+    const fieldInfos = state.targetLayer.fields.map((field) => {
       return { fieldName: field.name };
     });
 
@@ -151,24 +148,24 @@ export default function Query() {
       ],
     };
 
-    const fields = state.targetLayer.layer.fields;
+    const fields = state.targetLayer.fields;
     if (!fields.some((field) => field.type === "oid")) {
       fields.unshift({
         name: "ObjectID",
         type: "oid",
       });
     }
-
-    const queryResultLayer = new FeatureLayer({
-      title: state.targetLayer.layer.title + " نتيجة بحث",
-      geometryType: state.targetLayer.layer.geometryType,
-      spatialReference: state.targetLayer.layer.spatialReference,
+    const resultLayerParameters = {
+      title: state.targetLayer.title + " نتيجة بحث",
+      geometryType: state.targetLayer.geometryType,
+      spatialReference: state.targetLayer.spatialReference,
       popupEnabled: true,
       source,
       fields,
       renderer,
       popupTemplate,
-    });
+    } 
+    const queryResultLayer = new FeatureLayer(resultLayerParameters);
 
     map.add(queryResultLayer);
     widgets["legend"].layerInfos.push({
@@ -179,7 +176,7 @@ export default function Query() {
       sendMessage({
         type: "info",
         title: "البحث والاستعلام",
-        body: `اكتملت عملية البحث على طبقة ${state.targetLayer.layer.title}`,
+        body: `اكتملت عملية البحث على طبقة ${state.targetLayer.title}`,
       });
       const layersArray = [...map.layers.items];
       setState({
@@ -187,6 +184,7 @@ export default function Query() {
         layersArray,queryResultLayer,
         queryResult: response.features,
         downloadBtnDisabled: false,
+        resultLayerParameters
       });
     });
   }
@@ -200,7 +198,7 @@ export default function Query() {
   }
 
   async function downloadQueryResult(state) {
-    const geometryType = state.targetLayer.layer.geometryType;
+    const geometryType = state.targetLayer.geometryType;
     const features = state.queryResult.map((feature) => {
       const geometryGetter = {
         point: () => getPointGeom(),
@@ -255,7 +253,7 @@ export default function Query() {
       features: features,
     };
 
-    const fileName = state.targetLayer.layer.title;
+    const fileName = state.targetLayer.title;
     const geojson = JSON.stringify(geojsonQueryResult);
     const blob = new Blob([geojson], { type: "application/json" });
     const href = URL.createObjectURL(blob);
@@ -277,6 +275,43 @@ export default function Query() {
       allFeatures: [],
     })
   }
+
+  function CreateSeparateLayer(state) {
+    const randomColor = "#" + Math.floor(Math.random() * 16777215).toString(16)
+    const symbols = {
+      point: {
+        type: "simple-marker",
+        style: "circle",
+        color: randomColor,
+        size: "8px",
+      },
+      polyline: {
+        type: "simple-line",
+        color: randomColor,
+        width: 2,
+      },
+      polygon: {
+        type: "simple-fill",
+        color: randomColor,
+        outline: {
+          width: 2,
+          color: "#fff",
+        },
+      },
+    };
+    const newSymbol = symbols[state.targetLayer.geometryType];
+
+    const renderer = {
+      type: "simple",
+      symbol: newSymbol,
+    };
+    
+    const newSelectionLayer = new FeatureLayer(state.resultLayerParameters);
+    newSelectionLayer.title = state.targetLayer.title+ "_نسخة معدلة"
+    newSelectionLayer.renderer = renderer
+    map.layers.add(newSelectionLayer)
+  }
+
   return (
     <div className="flex-column-container">
       <label htmlFor="layerSelector">اختر الطبقة</label>
@@ -366,6 +401,13 @@ export default function Query() {
       )}
       <button className="button primaryBtn" onClick={() => search(state)}>
         بحث
+      </button>
+      <button
+        className="button primaryBtn"
+        disabled={state.downloadBtnDisabled}
+        onClick={() => CreateSeparateLayer(state)}
+      >
+        إنشاء طبقة جديدة
       </button>
       <button className="button primaryBtn" onClick={() => clearSearch(state)}>إلغاء البحث</button>
       <button

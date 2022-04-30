@@ -37,7 +37,8 @@ export default function SelectFeatures() {
     selectionLayerView: null,
     selectionResultLayer: null,
     resultFeatures: null,
-    interactiveSelectionActive: false,
+    resultLayerParameters:null,
+    interactiveSelectionActive: true,
     sketchInitialized: false,
   };
   const [state, setState] = useState(defaultState);
@@ -104,6 +105,11 @@ export default function SelectFeatures() {
   }
 
   function runQuery({ geometriesAry, spatialRelationship, state }) {
+    if(!targetLayerRef.current.value)
+    {
+      sendErrorMessage("الرجاء إكمال الحقول المطلوبة")
+      return
+    }
     const resultFeatures = getQueryResult(
       geometriesAry,
       spatialRelationship,
@@ -185,7 +191,7 @@ export default function SelectFeatures() {
         type: "oid",
       });
     }
-    const selectionResultLayer = new FeatureLayer({
+    const resultLayerParameters = {
       title: title + " نتيجة تحديد",
       geometryType: geometryType,
       spatialReference: spatialReference,
@@ -194,7 +200,8 @@ export default function SelectFeatures() {
       fields,
       renderer,
       source,
-    });
+    }
+    const selectionResultLayer = new FeatureLayer(resultLayerParameters);
 
     map.layers.add(selectionResultLayer);
     selectionResultLayer.queryExtent().then(function (result) {
@@ -207,6 +214,7 @@ export default function SelectFeatures() {
         setState({
           ...state,
           selectionResultLayer,
+          resultLayerParameters,
           resultFeatures: uniqueFeatures,
         });
       });
@@ -252,6 +260,43 @@ export default function SelectFeatures() {
       setState({ ...state, resultFeatures: null, selectionResultLayer: null });
     }
   }
+
+  function CreateSeparateLayer(state) {
+    const randomColor = "#" + Math.floor(Math.random() * 16777215).toString(16)
+    const symbols = {
+      point: {
+        type: "simple-marker",
+        style: "circle",
+        color: randomColor,
+        size: "8px",
+      },
+      polyline: {
+        type: "simple-line",
+        color: randomColor,
+        width: 2,
+      },
+      polygon: {
+        type: "simple-fill",
+        color: randomColor,
+        outline: {
+          width: 2,
+          color: "#fff",
+        },
+      },
+    };
+    const newSymbol = symbols[state.selectionResultLayer.geometryType];
+
+    const renderer = {
+      type: "simple",
+      symbol: newSymbol,
+    };
+    
+    const newSelectionLayer = new FeatureLayer(state.resultLayerParameters);
+    newSelectionLayer.title = state.targetLayerView.layer.title+ "_نسخة معدلة"
+    newSelectionLayer.renderer = renderer
+    map.layers.add(newSelectionLayer)
+  }
+
 
   async function downloadQueryResult(state) {
     const geometryType = state.selectionResultLayer.geometryType;
@@ -431,6 +476,7 @@ export default function SelectFeatures() {
         <button
           className="button primaryBtn"
           onClick={() => startSelection(state)}
+          disabled= {state.selectionLayerView && state.targetLayerView? false : true}
         >
           <i className="esri-icon-cursor-marquee"></i>
           &nbsp; بدء التحديد
@@ -443,6 +489,13 @@ export default function SelectFeatures() {
       >
         <i className="esri-icon-close"></i>
         &nbsp; الغاء التحديد
+      </button>
+      <button
+        className="button primaryBtn"
+        disabled={state.selectionResultLayer ? false : true}
+        onClick={() => CreateSeparateLayer(state)}
+      >
+        إنشاء طبقة جديدة
       </button>
       <button
         className="button successBtn"
