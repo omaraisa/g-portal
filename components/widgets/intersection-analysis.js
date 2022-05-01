@@ -1,73 +1,44 @@
-/* 
-send error msg
-popup template
-zoom
-*/
-import { useState, useRef, useContext } from "react";
+import { useState, useRef, useEffect, useContext } from "react";
 import { AppContext } from "../../pages";
 import * as geometryEngine from "@arcgis/core/geometry/geometryEngine";
 import FeatureLayer from "@arcgis/core/layers/FeatureLayer";
 import Graphic from "@arcgis/core/Graphic";
+import * as GIS from '../../modules/gis-module'
+import styles from "../sub_components/loading.module.css";
 
-const supportedLayerTypes = ["csv", "feature", "geojson", "map-image"];
-
-const allDataQuery = {
-  outFields: ["*"],
-  returnGeometry: true,
-  where: "",
-};
-
-const symbols = {
-  point: {
-    type: "simple-marker",
-    style: "circle",
-    color: "#202020",
-    size: "8px",
-  },
-  polyline: {
-    type: "simple-line",
-    color: "#202020",
-    width: 2,
-  },
-  polygon: {
-    type: "simple-fill",
-    color: "#202020",
-    outline: {
-      width: 2,
-      color: "#fff",
-    },
-  },
-};
 
 export default function IntersectionAnalysis() {
   const { map, view, layers, sendMessage } = useContext(AppContext);
   const [state, setState] = useState({
-    firstLayer: null,
-    secondLayer: null,
+    layer1: null,
+    layer2: null,
     geometryType: null,
+    loading:false
   });
-  const [firstLayerRef, secondLayerRef, sketchContainerRef, relationshipRef,stateRef] = [
-    useRef(),
-    useRef(),
-    useRef(),
-    useRef(),
-    useRef(),
-  ];
+  const stateRef = useRef()
   stateRef.current = state;
+  const [loading, setLoading] = useState(false)
 
-  function setFirstLayer(state) {
+  function setLayer(state,event,layerOrder) {
     try {
-      const layerIndex = firstLayerRef.current.value;
-      const firstLayer = layers[layerIndex];
-      const layer1Fields = firstLayer.fields;
+      const layerIndex = event.target.value;
+      const selectedLayer = layers[layerIndex];
+      let selectedLayerFields = selectedLayer.fields;
+      if(layerOrder>1)
+      {
+        const antiDuplicateFields =  selectedLayerFields.map(field => {
+          field.name = field.name+layerOrder
+          return field
+        })
+        selectedLayerFields = [...antiDuplicateFields]
+      }
   
-      firstLayer.queryFeatures(allDataQuery).then(function (result) {
-        setState({
-          ...state,
-          firstLayer,
-          layer1Fields,
-          firstLayerFeatures: result.features,
-        });
+      selectedLayer.queryFeatures(GIS.allDataQuery).then(function (result) {
+        const newState = {...state,}
+        newState[`layer${layerOrder}`] = selectedLayer
+        newState[`layer${layerOrder}Fields`] = selectedLayerFields
+        newState[`layer${layerOrder}Features`] = result.features
+        setState(newState);
       });
       
     } catch (error) {
@@ -76,42 +47,23 @@ export default function IntersectionAnalysis() {
     }
   }
 
-  function setSecondLayer(state) {
-    try {
-    const layerIndex = secondLayerRef.current.value;
-    const secondLayer = layers[layerIndex];
-    const layer2Fields = secondLayer.fields;
-    const antiDuplicateFields =  layer2Fields.map(field => {
-      field.name = field.name+"2"
-      return field
-    })
-
-    secondLayer.queryFeatures(allDataQuery).then(function (result) {
-      setState({
-        ...state,
-        secondLayer,
-        layer2Fields:antiDuplicateFields,
-        secondLayerFeatures: result.features,
-      });
-    });
-
-  } catch (error) {
-    sendErrorMessage('فشل الحصول على بيانات الطبقة')
-    console.log(error)
-  }
-  }
-
   function analyze(state) {    
+    setLoading(true)
     const resultGraphics = getResultGraphics(state);
     Promise.all(resultGraphics).then((response) => {
       response.length
         ? addAnalysisResult({ response, state: stateRef.current })
-        : sendErrorMessage("لا توجد نتيجة لهذا البحث")
-    });
+        : handleEmptyResult()
+        
+  });
+}
+
+function handleEmptyResult() {
+  sendErrorMessage("لا توجد نتيجة لهذا البحث")
+  setLoading(false)
   }
 
   function addAnalysisResult({ response, state}) {
-    
     const fields = [
       ...state.layer1Fields,
       ...state.layer2Fields,
@@ -122,7 +74,7 @@ export default function IntersectionAnalysis() {
       },
     ];
 
-    const symbol = symbols[stateRef.current.geometryType];
+    const symbol = GIS.symbols[stateRef.current.geometryType];
     symbol.color = "#" + Math.floor(Math.random() * 16777215).toString(16)
     const renderer = {
       type: "simple",
@@ -138,18 +90,18 @@ export default function IntersectionAnalysis() {
           fieldInfos
       }]
   }
-    const resultLayerParameters = {
-      title: `${state.firstLayer.title}_${state.secondLayer.title}_تقاطع`,
+
+    const intersectionLayer = new FeatureLayer({
+      title: `${state.layer1.title}_${state.layer2.title}_تقاطع`,
       source: response,
       popupEnabled: true,
       popupTemplate: intersectionLayerPopup,
       outFields: ["*"],
       objectIdField : "OBJECTID",
       geometryType : stateRef.current.geometryType,
-      spatialReference: state.firstLayer.spatialReference,
+      spatialReference: state.layer1.spatialReference,
       fields,renderer
-    }
-    const intersectionLayer = new FeatureLayer(resultLayerParameters);
+    });
     
     map.layers.add(intersectionLayer);
     intersectionLayer.queryExtent().then(function (result) {
@@ -157,9 +109,9 @@ export default function IntersectionAnalysis() {
       sendMessage({
         type: "info",
         title: "تحليل التقاطع",
-        body: `اكتملت عملية التحليل وتمت إضافة الطبقة ${state.firstLayer.title}_${state.secondLayer.title}_تقاطع`,
+        body: `اكتملت عملية التحليل وتمت إضافة الطبقة ${state.layer1.title}_${state.layer2.title}_تقاطع`,
       });
-      
+      setLoading(false)
       setState({...state,intersectionLayer});
     });
   }
@@ -170,21 +122,21 @@ export default function IntersectionAnalysis() {
     let objectID = 0;
 
     try {
-    state.firstLayerFeatures.forEach((firstFeature) => {
-      state.secondLayerFeatures.forEach((secondFeature) => {
+    state.layer1Features.forEach((firstFeature) => {
+      state.layer2Features.forEach((secondFeature) => {
         let intersectionGeom = geometryEngine.intersect(
           firstFeature.geometry,
           secondFeature.geometry
         );
 
         if (intersectionGeom) {
-          const attributes = { ...firstFeature.attributes };
+          const attributes = {...firstFeature.attributes};
           for (const [key, value] of Object.entries(secondFeature.attributes)) {
             attributes[key + "2"] = value;
           }
           attributes["OBJECTID"] = objectID;
           objectID++;
-
+          
           const intersectionGraphic = new Graphic({
             geometry: intersectionGeom,
             attributes: attributes,
@@ -209,59 +161,48 @@ export default function IntersectionAnalysis() {
       body: errorMessage,
     });
   }
-
-
-  function listSupportedLayers(layers) {
-   const options = layers.map((layer, index) => {
-      if (supportedLayerTypes.includes(layer.type)) {
-      return (
-        <option key={layer.id} value={index}>
-          {layer.title}
-        </option>
-      );
-      }
-    })
-    return options
-  }
-
-
+  
   return (
     <div className="flex-column-container">
       <h3>تحليل التقاطع Intersection</h3>
 
-      <label htmlFor="firstLayerRef">الطبقة الأولى</label>
+      <label htmlFor="firstLayer">الطبقة الأولى</label>
       <select
-        ref={firstLayerRef}
-        id="firstLayerRef"
+        id="firstLayer"
         className="select"
-        onChange={() => setFirstLayer(state)}
+        onChange={(event) => setLayer(state,event,1)}
       >
         <option value="" hidden>
           اختر
         </option>
-        {listSupportedLayers(layers)}
+        {GIS.listSupportedLayers(layers)}
       </select>
 
-      <label htmlFor="secondLayerRef">الطبقة الثانية</label>
+      <label htmlFor="secondLayer">الطبقة الثانية</label>
       <select
-        ref={secondLayerRef}
-        id="secondLayerRef"
+        id="secondLayer"
         className="select"
-        onChange={() => setSecondLayer(state)}
+        onChange={(event) => setLayer(state,event,2)}
       >
         <option value="" hidden>
           اختر
         </option>
-        {listSupportedLayers(layers)}
+        {GIS.listSupportedLayers(layers)}
       </select>
       <button
         className="button primaryBtn"
         onClick={() => analyze(state)}
-        disabled={state.firstLayer && state.secondLayer ? false : true}
+        disabled={state.layer1 && state.layer2 && !loading ? false : true}
       >
-        <i className="esri-icon-cursor-marquee"></i>
         &nbsp; بدء التحليل
       </button>
+      {loading && (
+          <div className={styles.loadingDiv} style={{ height: "3rem" }}>
+            <i
+              className={`esri-icon-loading-indicator  ${styles.loadingIcon}`}
+            ></i>
+          </div>
+        )}
     </div>
   );
 }

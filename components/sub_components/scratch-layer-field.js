@@ -17,6 +17,7 @@ export default function ScratchLayerField({
     deleteBtn: {
       fontSize: "2rem",
       flex: 0.1,
+      cursor:"pointer"
     },
     fieldName: {
       flex: 0.6,

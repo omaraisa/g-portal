@@ -78,12 +78,17 @@ export default function AddScratchLayer() {
   };
 
   const handleFieldsNoChange = () => {
-    let newFields = [];
+    let newFields = []
     const inputNumberOfFields = Number(numberOfFieldsRef.current.value);
-    if (inputNumberOfFields > state.fields.length) {
-      const numberOfNewFields = inputNumberOfFields - state.fields.length;
+    const deltaFieldsNumber = inputNumberOfFields - state.fields.length;
+    inputNumberOfFields > state.fields.length?
+    newFields = addFields()
+    :
+    newFields = dropFields()
+
+    function addFields() {
       const tempFields = [];
-      for (let i = 0; i < numberOfNewFields; i++) {
+      for (let i = 0; i < deltaFieldsNumber; i++) {
         const id = Math.floor(new Date().getTime())+Math.floor(Math.random() * 999);
         const newField = {
           id: id,
@@ -92,13 +97,13 @@ export default function AddScratchLayer() {
         };
         tempFields.push(newField);
       }
-      newFields = [...state.fields, ...tempFields];
-    } else {
-      newFields = [...state.fields];
-      const numberOfDroppedFields = state.fields.length - inputNumberOfFields;
-      for (let i = 0; i < numberOfDroppedFields; i++) {
-        newFields.pop();
-      }
+      return [...state.fields, ...tempFields];
+    }
+
+    function dropFields() {
+      const tempFields =  [...state.fields]
+      tempFields.length = inputNumberOfFields
+      return tempFields
     }
 
     setState({ ...state, fields: newFields });

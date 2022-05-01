@@ -6,8 +6,6 @@ export default function Bookmarks({view}) {
   const [state, setState] = useState([]);
   const [formVisible, setFormVisibility] = useState(false);
   useEffect(() => {
-    // setState(bookmarksDB);
-    // async function getLocalBookmarks () {}
     if (localStorage.getItem("localBookmarks") !== null) {
       setState(JSON.parse(localStorage.getItem("localBookmarks")));
     }

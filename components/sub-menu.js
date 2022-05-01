@@ -20,6 +20,7 @@ const Basemap = React.lazy(() => import('./widgets/basemap'))
 const SelectFeatures = React.lazy(() => import('./submenu_components/select-features'))
 const Query = React.lazy(() => import('./widgets/query'))
 const IntersectionAnalysis = React.lazy(() => import('./widgets/intersection-analysis'))
+const UnionAnalysis = React.lazy(() => import('./widgets/union-analysis'))
 
 
 const components = {
@@ -38,6 +39,7 @@ const components = {
   SelectFeatures:SelectFeatures,
   Query:Query,
   IntersectionAnalysis:IntersectionAnalysis,
+  UnionAnalysis:UnionAnalysis,
   Bookmarks:Bookmarks,
   Pane4: HTML_ELEMENTS_TEMPLATES,
   GPortalInfo:GPortalInfo,

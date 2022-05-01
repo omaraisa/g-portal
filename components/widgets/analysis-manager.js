@@ -29,7 +29,7 @@ export default function AnalysisManager() {
       </b>
       <ul hidden={state.overlay}>
         <li onClick={() => goToSubMenu("IntersectionAnalysis")}>Intersect</li>
-        <li onClick={() => goToSubMenu("SelectFeatures")}>Union</li>
+        <li onClick={() => goToSubMenu("UnionAnalysis")}>Union</li>
       </ul>
 
       <b
