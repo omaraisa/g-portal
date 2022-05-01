@@ -30,6 +30,7 @@ export default function AnalysisManager() {
       <ul hidden={state.overlay}>
         <li onClick={() => goToSubMenu("IntersectionAnalysis")}>Intersect</li>
         <li onClick={() => goToSubMenu("UnionAnalysis")}>Union</li>
+        <li onClick={() => goToSubMenu("MergeAnalysis")}>Merge</li>
       </ul>
 
       <b
@@ -39,7 +40,7 @@ export default function AnalysisManager() {
         {state.proximity ? "+" : "-"} Proximity
       </b>
       <ul hidden={state.proximity}>
-        <li onClick={() => goToSubMenu("SelectFeatures")}>Buffer</li>
+        <li onClick={() => goToSubMenu("BufferAnalysis")}>Buffer</li>
         <li onClick={() => goToSubMenu("SelectFeatures")}>Near</li>
       </ul>
 

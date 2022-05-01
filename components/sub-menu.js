@@ -21,6 +21,8 @@ const SelectFeatures = React.lazy(() => import('./submenu_components/select-feat
 const Query = React.lazy(() => import('./widgets/query'))
 const IntersectionAnalysis = React.lazy(() => import('./widgets/intersection-analysis'))
 const UnionAnalysis = React.lazy(() => import('./widgets/union-analysis'))
+const BufferAnalysis = React.lazy(() => import('./widgets/buffer-analysis'))
+const MergeAnalysis = React.lazy(() => import('./widgets/merge-analysis'))
 
 
 const components = {
@@ -40,6 +42,8 @@ const components = {
   Query:Query,
   IntersectionAnalysis:IntersectionAnalysis,
   UnionAnalysis:UnionAnalysis,
+  BufferAnalysis:BufferAnalysis,
+  MergeAnalysis:MergeAnalysis,
   Bookmarks:Bookmarks,
   Pane4: HTML_ELEMENTS_TEMPLATES,
   GPortalInfo:GPortalInfo,

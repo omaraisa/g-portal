@@ -21,7 +21,7 @@ export default function UnionAnalysis() {
 
   function analyze(state) {
     setLoading(true);
-    const allFeatures = getResultGraphics(state);
+    const allFeatures = getAllFeatures(state);
     Promise.all(allFeatures).then((response) => {
       const flatAryOfFeatures = response.flat()
       response.length
@@ -107,7 +107,7 @@ export default function UnionAnalysis() {
 
   }
 
-  function getResultGraphics(state) {
+  function getAllFeatures(state) {
     const allFeatures = state.layers.map(input=>{
       return input.layer.queryFeatures(GIS.allDataQuery).then(response=> response.features).catch((error) => {
         sendErrorMessage("حدث خطأ أثناء معالجة البيانات الرجاء المحاولة مرة أخرى");
@@ -159,9 +159,9 @@ export default function UnionAnalysis() {
   }
   }
 
-  function updateLayers({ state, unionLayerId, mapLayerIndex }) {
+  function updateLayers({ state, id, mapLayerIndex }) {
     const unionLayers = state.layers.map(input => {
-      if(input.id === unionLayerId)
+      if(input.id === id)
       {
         input.layer = layers[mapLayerIndex]
       }
@@ -169,8 +169,8 @@ export default function UnionAnalysis() {
     })
     setState({...state, layers:unionLayers,allInputsValid:inputsChecker(unionLayers)})
   }
-  function deleteLayer({ state, unionLayerId }) {
-    const unionLayers = state.layers.filter((layer) => layer.id !== unionLayerId)
+  function deleteLayer({ state, id }) {
+    const unionLayers = state.layers.filter((layer) => layer.id !== id)
     if(unionLayers.length < 2)
     {
       unionLayers.push({
@@ -210,8 +210,8 @@ export default function UnionAnalysis() {
           key={layer.id}
           id={layer.id}
           layers={layers}
-          updateLayers={({ unionLayerId, mapLayerIndex }) => updateLayers({ state, unionLayerId, mapLayerIndex })}
-          deleteLayer={({ unionLayerId }) => deleteLayer({ state, unionLayerId })}
+          updateLayers={({ id, mapLayerIndex }) => updateLayers({ state, id, mapLayerIndex })}
+          deleteLayer={({ id }) => deleteLayer({ state, id })}
         />;
       })}
 

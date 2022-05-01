@@ -35,7 +35,7 @@ export default function UnionAnalysisLayer({
         className="select"
         ref={layerRef}
         style={styles.layerSelect}
-        onChange={() => updateLayers({unionLayerId:id,mapLayerIndex:layerRef.current.value})}
+        onChange={() => updateLayers({id,mapLayerIndex:layerRef.current.value})}
       >
         <option value="" hidden>
           اختر
@@ -55,7 +55,7 @@ export default function UnionAnalysisLayer({
       <i
         className={`esri-icon-close-circled`}
         style={styles.deleteBtn}
-        onClick={() => deleteLayer({unionLayerId:id})}
+        onClick={() => deleteLayer({id})}
       ></i>
     </div>
   );
