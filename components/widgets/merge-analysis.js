@@ -4,7 +4,7 @@ import FeatureLayer from "@arcgis/core/layers/FeatureLayer";
 import Graphic from "@arcgis/core/Graphic";
 import * as GIS from "../../modules/gis-module";
 import styles from "../sub_components/loading.module.css";
-import UnionAnalysisLayer from "../sub_components/union-analysis-layer";
+import AnalysisLayer from "../sub_components/analysis-layer";
 import * as geometryEngine from "@arcgis/core/geometry/geometryEngine";
 
 export default function MergeAnalysis() {
@@ -216,7 +216,7 @@ export default function MergeAnalysis() {
 
       {state.layers.map((layer, index) => {
         return (
-          <UnionAnalysisLayer
+          <AnalysisLayer
             key={layer.id}
             id={layer.id}
             layers={layers}

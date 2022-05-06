@@ -7,7 +7,7 @@ import styles from "../sub_components/loading.module.css";
 import * as geometryEngine from "@arcgis/core/geometry/geometryEngine";
 
 export default function BufferAnalysis() {
-  const { map, view, layers, sendMessage } = useContext(AppContext);
+  const { map, view, widgets, layers, sendMessage } = useContext(AppContext);
   const [inputTypeRef, layerSelectorRef, distanceValueRef, distanceFieldRef,measureUnitRef] = [
     useRef(),
     useRef(),
@@ -127,6 +127,9 @@ export default function BufferAnalysis() {
 
     map.layers.add(bufferLayer);
     bufferLayer.queryExtent().then(function (result) {
+      widgets["legend"].layerInfos.push({
+        layer: bufferLayer,
+      });
       view.goTo(result.extent);
       sendMessage({
         type: "info",

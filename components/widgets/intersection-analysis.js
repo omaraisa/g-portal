@@ -59,7 +59,7 @@ export default function IntersectionAnalysis() {
 }
 
 function handleEmptyResult() {
-  sendErrorMessage("لا توجد نتيجة لهذا البحث")
+  sendErrorMessage("لا توجد نتيجة لهذه العملية")
   setLoading(false)
   }
 

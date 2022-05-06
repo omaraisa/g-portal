@@ -4,6 +4,9 @@ import Accordion from 'react-bootstrap/Accordion'
 import Loading from "./sub_components/loading";
 import AnalysisManager from './widgets/analysis-manager';
 import Query from './widgets/query';
+import Tools from './widgets/tools';
+import MapFrames from './widgets/maps-frames';
+import StatisticalAnalysis from './widgets/statistical-analysis';
 import '../node_modules/bootstrap/dist/css/bootstrap.min.css'
 const LegendComponent = React.lazy(() => import('./widgets/legend'))
 const LayerListComponent = React.lazy(() => import('./widgets/layerlist'))
@@ -75,7 +78,7 @@ export default function MainMenu(props) {
     <i className="esri-icon-line-chart main-menu-icon" ></i> 
     <h5>تحليل إحصائي</h5></Accordion.Header>
     <Accordion.Body>
-    <AnalysisManager />
+    <StatisticalAnalysis />
     </Accordion.Body>
   </Accordion.Item>
   
@@ -85,7 +88,7 @@ export default function MainMenu(props) {
     <i className="esri-icon-settings2 main-menu-icon" ></i> 
     <h5>أدوات الخريطة</h5></Accordion.Header>
     <Accordion.Body>
-      Lorem  
+      <Tools />  
     </Accordion.Body>
   </Accordion.Item>
   
@@ -94,7 +97,7 @@ export default function MainMenu(props) {
     <i className="esri-icon-collection main-menu-icon" ></i> 
     <h5>قائمة الخرائط</h5></Accordion.Header>
     <Accordion.Body>
-      Lorem  
+      <MapFrames />  
     </Accordion.Body>
   </Accordion.Item>
   

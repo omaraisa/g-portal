@@ -230,13 +230,13 @@ i {
 }
 
 .primaryBtn:disabled {
-  cursor: not-allowed;
+  /*cursor: not-allowed*/
   background: #518cc6;
   color: rgb(230, 230, 230);
 }
 
 .secondaryBtn {
-  background-color: transparent;
+  background-color: #fff;
   border: 0.1rem solid var(--darkPrimary);
   border-radius: 0.2rem;
   color: var(--darkPrimary);
@@ -248,7 +248,7 @@ i {
 }
 
 .secondaryBtn:disabled {
-  cursor: not-allowed;
+  /*cursor: not-allowed*/
   background: #518cc6;
   color: rgb(230, 230, 230);
 }
@@ -267,7 +267,7 @@ i {
 }
 
 .dangerBtn:disabled {
-  cursor: not-allowed;
+  /*cursor: not-allowed*/
   background: #c0666a;
   color: rgb(230, 230, 230);
 }
@@ -286,7 +286,7 @@ i {
 }
 
 .warningBtn:disabled {
-  cursor: not-allowed;
+  /*cursor: not-allowed*/
   background: #a89c6a;
   color: rgb(230, 230, 230);
 }
@@ -305,7 +305,7 @@ i {
 }
 
 .successBtn:disabled {
-  cursor: not-allowed;
+  /*cursor: not-allowed*/
   background: #688161;
   color: rgb(230, 230, 230);
 }
@@ -324,7 +324,7 @@ i {
 }
 
 .grayBtn:disabled {
-  cursor: not-allowed;
+  /*cursor: not-allowed*/
   background: #c7c7c7;
   color: white;
 }
@@ -343,7 +343,7 @@ i {
 }
 
 .darkBtn:disabled {
-  cursor: not-allowed;
+  /*cursor: not-allowed*/
   background: #c4c4c4;
   color: white;
 }
@@ -362,7 +362,7 @@ i {
 }
 
 .roundBtn:disabled {
-  cursor: not-allowed;
+  /*cursor: not-allowed*/
   background: #518cc6;
   color: rgb(230, 230, 230);
 }
@@ -616,7 +616,7 @@ textarea:focus ,input:focus {
 }
 
 .inputfile:disabled + label {
-  cursor: not-allowed;
+  /*cursor: not-allowed*/
   background: #518cc6;
   color: rgb(230, 230, 230);
 }
@@ -709,7 +709,7 @@ textarea:focus ,input:focus {
 
 
 .downloadBtn:disabled  {
-  cursor: not-allowed;
+  /*cursor: not-allowed*/
   background: #518cc6;
   color: rgb(230, 230, 230);
 }
@@ -766,6 +766,10 @@ textarea {
   outline:none;
   border:0.1rem solid var(--darkPrimary);
   transition-duration: .7s;
+}
+
+.select {
+  max-width: 100%;
 }
 
 .info-text {

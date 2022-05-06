@@ -4,7 +4,7 @@ import FeatureLayer from "@arcgis/core/layers/FeatureLayer";
 import Graphic from "@arcgis/core/Graphic";
 import * as GIS from "../../modules/gis-module";
 import styles from "../sub_components/loading.module.css";
-import UnionAnalysisLayer from "../sub_components/union-analysis-layer";
+import AnalysisLayer from "../sub_components/analysis-layer";
 
 export default function UnionAnalysis() {
   const { map, view, layers, sendMessage } = useContext(AppContext);
@@ -125,73 +125,12 @@ export default function UnionAnalysis() {
       body: errorMessage,
     });
   }
-
-  const handleLayersNoChange = () => {
-    const inputNumberOfLayers = Number(numberOfLayersRef.current.value);
-    if(inputNumberOfLayers >=2 && inputNumberOfLayers <=10)
-    {
-    let newLayers = [];
-    const deltaLayersNumber = inputNumberOfLayers - state.layers.length;
-    inputNumberOfLayers > state.layers.length
-      ? (newLayers = addLayers())
-      : (newLayers = dropLayers());
-
-    function addLayers() {
-      const tempLayers = [];
-      for (let i = 0; i < deltaLayersNumber; i++) {
-        const id = Math.floor(new Date().getTime())+Math.floor(Math.random() * 999);
-        const newLayer = {
-          id: id,
-          layer:null,
-        }
-        tempLayers.push(newLayer);
-      }
-      return [...state.layers, ...tempLayers];
-    }
-
-    function dropLayers() {
-      const tempLayers = [...state.layers];
-      tempLayers.length = inputNumberOfLayers;
-      return tempLayers;
-    }
-
-    setState({ ...state, layers: newLayers,allInputsValid:inputsChecker(newLayers) });
-  }
-  }
-
-  function updateLayers({ state, id, mapLayerIndex }) {
-    const unionLayers = state.layers.map(input => {
-      if(input.id === id)
-      {
-        input.layer = layers[mapLayerIndex]
-      }
-      return input
-    })
-    setState({...state, layers:unionLayers,allInputsValid:inputsChecker(unionLayers)})
-  }
-  function deleteLayer({ state, id }) {
-    const unionLayers = state.layers.filter((layer) => layer.id !== id)
-    if(unionLayers.length < 2)
-    {
-      unionLayers.push({
-        id: Math.floor(new Date().getTime())+Math.floor(Math.random() * 999),
-        layer:null,
-      })
-    }
-    numberOfLayersRef.current.value = unionLayers.length
-    setState({...state, layers:unionLayers,allInputsValid:inputsChecker(unionLayers)})
-  }
-
-  function inputsChecker(layers) {
-    const allInputsValid = layers.every(input => input.layer? true : false)
-    return allInputsValid
-  }
   
   // useEffect(_=> console.log((state)),[state])
 
   return (
     <div className="flex-column-container">
-      <h3>تحليل الدمج Union</h3>
+      <h3>تحليل الاتحاد Union</h3>
 
       <label htmlFor="numberOfLayers">عدد الطبقات</label>
       <input
@@ -202,23 +141,32 @@ export default function UnionAnalysis() {
         min={2}
         max={10}
         ref={numberOfLayersRef}
-        onChange={() => handleLayersNoChange()}
+        onChange={() =>
+          GIS.handleLayersNumChange({
+            state,
+            inputNumberOfLayers: numberOfLayersRef.current.value,
+            minNumber:2,
+            setState,
+          })
+        }
       ></input>
 
       {state.layers.map((layer, index) => {
-        return <UnionAnalysisLayer
+        return <AnalysisLayer
           key={layer.id}
           id={layer.id}
           layers={layers}
-          updateLayers={({ id, mapLayerIndex }) => updateLayers({ state, id, mapLayerIndex })}
-          deleteLayer={({ id }) => deleteLayer({ state, id })}
+          geometry="polygon"
+          updateLayers={({ id, mapLayerIndex }) =>
+              GIS.updateLayers({ state, setState, layers, id, mapLayerIndex })}
+              deleteLayer={({ id }) => GIS.deleteLayer({ state, setState,numberOfLayersRef, id })}
         />;
       })}
 
       <button
         className="button primaryBtn"
         onClick={() => analyze(state)}
-        disabled={!state.allInputsValid || loading? true : false}
+        disabled={!state.allInputsValid || loading}
       >
         &nbsp; بدء التحليل
       </button>

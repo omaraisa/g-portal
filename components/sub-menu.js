@@ -23,6 +23,11 @@ const IntersectionAnalysis = React.lazy(() => import('./widgets/intersection-ana
 const UnionAnalysis = React.lazy(() => import('./widgets/union-analysis'))
 const BufferAnalysis = React.lazy(() => import('./widgets/buffer-analysis'))
 const MergeAnalysis = React.lazy(() => import('./widgets/merge-analysis'))
+const NearAnalysis = React.lazy(() => import('./widgets/near-analysis'))
+const ClipAnalysis = React.lazy(() => import('./widgets/clip-analysis'))
+const MeasureArea = React.lazy(() => import('./widgets/measure-area'))
+const MeasureDistance = React.lazy(() => import('./widgets/measure-distance'))
+const CoordinateConversion = React.lazy(() => import('./widgets/coordinate-conversion'))
 
 
 const components = {
@@ -44,6 +49,11 @@ const components = {
   UnionAnalysis:UnionAnalysis,
   BufferAnalysis:BufferAnalysis,
   MergeAnalysis:MergeAnalysis,
+  NearAnalysis:NearAnalysis,
+  ClipAnalysis:ClipAnalysis,
+  MeasureArea:MeasureArea,
+  MeasureDistance:MeasureDistance,
+  CoordinateConversion:CoordinateConversion,
   Bookmarks:Bookmarks,
   Pane4: HTML_ELEMENTS_TEMPLATES,
   GPortalInfo:GPortalInfo,

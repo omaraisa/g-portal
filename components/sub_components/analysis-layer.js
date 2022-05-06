@@ -1,19 +1,20 @@
 // import styles from './bookmark.module.css'
 import React, { useState, useRef } from "react";
-const supportedLayerTypes = ["csv", "feature", "geojson"]
+import * as GIS from "../../modules/gis-module";
 
-export default function UnionAnalysisLayer({
+export default function AnalysisLayer({
   id,
   layers,
   updateLayers,
   deleteLayer,
+  geometry
 }) {
   const styles = {
     container: {
       display: "flex",
       flexFlow: "row nowrap",
       alignItems: "center",
-      widght: "100%",
+      width: "100%",
       gap: ".5rem"
     },
     deleteBtn: {
@@ -23,6 +24,7 @@ export default function UnionAnalysisLayer({
     },
     layerSelect: {
       flex: 0.9,
+      maxWidth: "90%"
     },
   };
 
@@ -41,15 +43,7 @@ export default function UnionAnalysisLayer({
           اختر
         </option>
         {
-          layers.map((layer, index) => {
-            if (supportedLayerTypes.includes(layer.type) && layer.geometryType ==="polygon") {
-            return (
-              <option key={layer.id} value={index}>
-                {layer.title}
-              </option>
-            );
-            }
-          })
+          GIS.listSupportedLayers(layers,geometry)
         }
       </select>
       <i

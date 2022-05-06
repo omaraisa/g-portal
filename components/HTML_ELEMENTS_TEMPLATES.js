@@ -41,6 +41,7 @@ export default function HTML_ELEMENTS_TEMPLATES(props) {
         <option value="5">Option 5</option>
       </select>
 
+      
       <input type="checkbox" id="switch" className="switch-input" />
       <label htmlFor="switch" className="switch-lable">
         Toggle

@@ -41,7 +41,7 @@ export default function AnalysisManager() {
       </b>
       <ul hidden={state.proximity}>
         <li onClick={() => goToSubMenu("BufferAnalysis")}>Buffer</li>
-        <li onClick={() => goToSubMenu("SelectFeatures")}>Near</li>
+        <li onClick={() => goToSubMenu("NearAnalysis")}>Near</li>
       </ul>
 
       <b
@@ -52,7 +52,7 @@ export default function AnalysisManager() {
       </b>
       <ul hidden={state.extract}>
         <li onClick={() => goToSubMenu("Query")}>Select</li>
-        <li onClick={() => goToSubMenu("SelectFeatures")}>Clip</li>
+        <li onClick={() => goToSubMenu("ClipAnalysis")}>Clip</li>
       </ul>
 
 

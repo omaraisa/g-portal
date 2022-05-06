@@ -17,7 +17,7 @@ export default function MainMap() {
       zoom:6,
       center: [32,15],
       ui : {
-          components : ["zoom","compass"]
+          components : ["zoom","compass","ScaleBar"]
       }});
     view.map = map;
     view.container = mapRef.current;
