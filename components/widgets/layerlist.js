@@ -1,11 +1,11 @@
 import { useRef, useEffect, useContext } from "react";
 import LayerList from "@arcgis/core/widgets/LayerList";
-import FeatureTable from "@arcgis/core/widgets/FeatureTable";
 import { AppContext } from "../../pages";
+import * as GIS from "../../modules/gis-module";
 
 let LayerListWidget,layerIndex;
 export default function LayerListComponent({ sendBackWidget }) {
-  const { map, view } = useContext(AppContext);
+  const { map, view,updateTargetLayers,goToBottomPane } = useContext(AppContext);
   const LayerListRef = useRef();
   const styles = {
     container: {
@@ -37,13 +37,13 @@ export default function LayerListComponent({ sendBackWidget }) {
                 className: "esri-icon-zoom-out-fixed",
                 id: "fullExtent",
               },
+              {
+                //title: "Attribute Table",
+                title: "البيانات الوصفية",
+                className: "esri-icon-table",
+                id: "attributeTable",
+              },
             ],
-            //   {
-            //     //title: "Attribute Table",
-            //     title: "البيانات الوصفية",
-            //     className: "esri-icon-table",
-            //     id: "attributeTable",
-            //   },
             //   {
             //     //title: "Attribute Table",
             //     title: "استخراج البيانات",
@@ -125,42 +125,10 @@ export default function LayerListComponent({ sendBackWidget }) {
 
         }
         function attributeTable() {
-          if (
-            selectedLayer.type === "csv" ||
-            selectedLayer.type === "feature" ||
-            selectedLayer.type === "json" ||
-            selectedLayer.type === "geojson"
-          ) {
-            const fieldConfigs = [];
-            // document.getElementById("attributesTableDiv").innerHTML = "";
-            selectedLayer.fields.forEach((field) => {
-              fieldConfigs.push({
-                name: field.name,
-                label: field.name,
-                visible: true,
-              });
-            });
-            const featureTable = new FeatureTable({
-              view: view, // The view property must be set for the select/highlight to work
-              layer: selectedLayer,
-              container: "attributesTableDiv",
-              fieldConfigs: fieldConfigs,
-              menuConfig: {
-                items: [
-                  {
-                    label: "Close Table",
-                    iconClass: "esri-icon-close-circled",
-                    clickFunction: closeAttributeTable,
-                  },
-                ],
-              },
-            });
-            view.ui.add(featureTable, "bottom-left");
-
-            function closeAttributeTable() {
-              featureTable.menu.open = false;
-              view.ui.remove(featureTable);
-            }
+          if(GIS.supportedLayerTypes.includes(selectedLayer.type))
+           {
+            updateTargetLayers({FeatureTableLayer:selectedLayer})
+            goToBottomPane("FeatureTable")            
           }
         }
         function exportData() {

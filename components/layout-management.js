@@ -11,18 +11,28 @@ export const defaultLayout = {
   rightPaneMinimized: false,
   middlePaneFlex: 0.6,
   middlePaneMinSize: 600,
+  mapPaneFlex:1,
+  bottomPaneFlex:0,
+  bottomPaneArrow:"▲",
+  bottomPaneMaxSize: 1,
+  bottomPaneMinimized: true,
   animationOn: false,
   subMenuCurrentComponent: "ClipAnalysis",
+  bottomPaneCurrentComponent: "DefaultBottomPane",
 };
 
 export const LayoutManager = (state,action) => {
   switch (action.type) {
     case 'goToSubMenu':
       return goToSubMenu(state, action.targetComponent);
+      case 'goToPreSubMenu':
+        return goToPreSubMenu(state,action)
+        case 'goToBottomPane':
+          return goToBottomPane(state, action.targetComponent);
+    case 'goToPreBottomPane':
+      return goToPreBottomPane(state, action);
     case 'changeLayout':
       return changeLayout(state,action)
-    case 'goToPreSubMenu':
-      return goToPreSubMenu(state,action)
     case 'resizeMenu':
       return resizeMenu(state,action)
     case 'toggleMenus':
@@ -46,27 +56,45 @@ export const LayoutManager = (state,action) => {
     updatedMenuProps[`animationOn`] = animationOn
     return updatedMenuProps
   }
-
+   const updateMiddlePaneProps = (mapPaneFlex,bottomPaneFlex,bottomPaneMaxSize,bottomPaneArrow,bottomPaneMinimized) => {
+    return {mapPaneFlex,bottomPaneFlex,bottomPaneMaxSize,bottomPaneArrow,bottomPaneMinimized}
+  }
 
    const toggleMenus = (state,{side})  =>  {
-    if(side === "right")
-    {
-    const newLayout = state.layout.rightPaneMinimized?
-    {...state.layout,...updateMenusProps(["right",(state.layout.middlePaneFlex - 0.2),"▶",0.21,200,500,false,true])}
-    :
-    {...state.layout,...updateMenusProps(["right",(state.layout.middlePaneFlex + state.layout.rightPaneFlex),"◀",0,0,1,true,true])}
-    const newState = {...state,layout:newLayout}
-    return newState
-  }
-  if(side === "left")
-  {
-    const newLayout = state.layout.leftPaneMinimized?
-    {...state.layout,...updateMenusProps(["left",(state.layout.middlePaneFlex - 0.2),"◀",0.21,150,500,false,true])}
-    :
-    {...state.layout,...updateMenusProps(["left",(state.layout.middlePaneFlex + state.layout.leftPaneFlex),"▶",0,0,1,true,true])}
-    const newState = {...state,layout:newLayout}
-    return newState
-  }
+     const toggleSides = {
+       right: () => toogleRightMenu(),
+       left: () => toogleLeftMenu(),
+       bottom: () => toogleBottomMenu(),
+     }
+     function toogleRightMenu() {
+       const newLayout = state.layout.rightPaneMinimized?
+       {...state.layout,...updateMenusProps(["right",(state.layout.middlePaneFlex - 0.2),"▶",0.21,200,500,false,true])}
+       :
+       {...state.layout,...updateMenusProps(["right",(state.layout.middlePaneFlex + state.layout.rightPaneFlex),"◀",0,0,1,true,true])}
+       const newState = {...state,layout:newLayout}
+       return newState
+      }
+
+     function toogleLeftMenu() {
+       const newLayout = state.layout.leftPaneMinimized?
+       {...state.layout,...updateMenusProps(["left",(state.layout.middlePaneFlex - 0.2),"◀",0.21,150,500,false,true])}
+       :
+       {...state.layout,...updateMenusProps(["left",(state.layout.middlePaneFlex + state.layout.leftPaneFlex),"▶",0,0,1,true,true])}
+       const newState = {...state,layout:newLayout}
+       return newState
+      }
+      
+      function toogleBottomMenu() {
+       const newLayout = state.layout.bottomPaneMinimized?
+       {...state.layout,...updateMiddlePaneProps(0.6,0.4,2000,"▼",false)}
+       :
+       {...state.layout,...updateMiddlePaneProps(1,0,1,"▲",true)}
+       const newState = {...state,layout:newLayout}
+       return newState
+      }
+
+      return toggleSides[side]()
+   
   }
 
   
@@ -87,12 +115,47 @@ export const LayoutManager = (state,action) => {
   }
   
    const goToSubMenu =  (state,targetComponent)  =>  {
-    return {...state,layout:{...state.layout,subMenuCurrentComponent:targetComponent}} 
-  }
+    const expandPaneProps = {
+          leftPaneArrow: "◀",
+          leftPaneFlex: 0.2,
+          leftPaneMinSize: 150,
+          leftPaneMaxSize: 500,
+          leftPaneMinimized: false,
+          middlePaneFlex: state.layout.middlePaneFlex - 0.2,
+    }
 
-   const goToPreSubMenu =  (state,{previousComponent})  =>  {
+    let newLayout = {...state.layout,subMenuCurrentComponent:targetComponent}
+    if (state.layout.leftPaneMinimized) 
+    newLayout = {...newLayout,...expandPaneProps}
+
+    return {...state,layout:newLayout} 
+
+    // return {...state,layout:{...state.layout,subMenuCurrentComponent:targetComponent}} 
+  }
+  
+  const goToPreSubMenu =  (state,{previousComponent})  =>  {
     if(previousComponent)
     return {...state,layout:{...state.layout,subMenuCurrentComponent:previousComponent}}
+  }
+  
+   const goToBottomPane =  (state,targetComponent)  =>  {
+     const expandPaneProps = {
+      mapPaneFlex:0.6,
+      bottomPaneFlex:0.4,
+      bottomPaneArrow:"▼",
+      bottomPaneMaxSize: 2000,
+      bottomPaneMinimized: false,
+    }
+
+    let newLayout = {...state.layout,bottomPaneCurrentComponent:targetComponent}
+    if (state.layout.bottomPaneMinimized) 
+    newLayout = {...newLayout,...expandPaneProps}
+
+    return {...state,layout:newLayout} 
+  }
+  
+   const goToPreBottomPane =  (state,{previousComponent})  =>  {
+    return {...state,layout:{...state.layout,bottomPaneCurrentComponent:previousComponent}} 
   }
   
   

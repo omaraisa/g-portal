@@ -52,13 +52,13 @@ i {
   font-size: 2rem;
 }
 
+.reflex-container > .reflex-element {
+  overflow:hidden !important;
+  }
 /* .right-pane {
   transition:all 0.51s ease-in ;
   }
 
-.middle-pane {
-  transition:all 0.51s ease-in ;
-  }
 
 .left-pane {
   transition:all 0.51s ease-in ;
@@ -70,10 +70,15 @@ i {
 }
 
 .reflex-splitter {
-  width: 7px !important;
   display: flex !important;
   align-items: center !important;
   justify-content: center !important;
+}
+.vertical-reflex-spilitter {
+  width: 7px !important;
+}
+.horizontal-reflex-spilitter {
+  height: 7px !important;
 }
 
 .accordion-button {

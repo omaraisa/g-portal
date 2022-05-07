@@ -21,6 +21,7 @@ import MinimizeMenu from "../components/sub_components/minimize-menu";
 import { ReflexContainer, ReflexSplitter, ReflexElement } from "react-reflex";
 import "react-reflex/styles.css";
 import { useState, useEffect, useRef, useReducer, } from "react";
+import BottomPane from "../components/bottom-pane";
 const MainMap = React.lazy(() => import("../components/main-map"));
 
 export const AppContext = React.createContext();
@@ -41,6 +42,7 @@ export default function Home() {
     view: null,
     layers: [],
     widgets: {},
+    targetLayers: {},
   };
   
   function reducer(state, action) {
@@ -70,7 +72,7 @@ export default function Home() {
 //       } else return LayoutResponse;  
 //     }  
     
-//     const expandLeftMenu = () => {
+//     const expandPane = () => {
 //       if (Object.entries(action.newState).length) return action.newState;
 //       return state;
 //     }      
@@ -92,7 +94,7 @@ export default function Home() {
 //       goToPreSubMenu:LayoutManagement,
 //       resizeMenu:LayoutManagement,
 //       toggleMenus:LayoutManagement,
-//       expandLeftMenu : expandLeftMenu,
+//       expandPane : expandPane,
 //       goToSubMenu : goToSubMenu,     
 //     }  
     
@@ -127,6 +129,8 @@ export default function Home() {
       case "goToSubMenu":
       case "changeLayout":
       case "goToPreSubMenu":
+      case "goToPreBottomPane":
+      case "goToBottomPane":
         case "resizeMenu":
           case "toggleMenus":
             const LayoutResponse = LayoutManager(state, action);
@@ -139,9 +143,13 @@ export default function Home() {
               const layers = action.layers;
               return { ...state, layers };
 
-      case "expandLeftMenu":
-        if (Object.entries(action.newState).length) return action.newState;
-        return state;
+      case "updateTargetLayers":
+        const targetLayers = {...state.targetLayers,...action.layer}
+        return {...state,targetLayers}
+
+      case "expandPane":
+        return action.newState;
+        // return state;
 
         default:
         sendMessage({
@@ -154,7 +162,9 @@ export default function Home() {
   }
   const [state, dispatch] = useReducer(reducer, appInitials);
   const goToSubMenu = (targetComponent) =>dispatch({ type: "goToSubMenu", targetComponent })
+  const goToBottomPane = (targetComponent) =>dispatch({ type: "goToBottomPane", targetComponent })
   const updateLayers = (layers) =>dispatch({ type: "updateLayers", layers })
+  const updateTargetLayers = (layer) =>dispatch({ type: "updateTargetLayers", layer})
   const sendBackMapView= (map, view) =>dispatch({ type: "sendBackMapView", map, view })
 
   useEffect(() => {
@@ -166,33 +176,34 @@ export default function Home() {
 
   
 
-  useEffect(() => {
-    if (Object.entries(state).length) {
-      if (state.layout.leftPaneMinimized) {
-        const newLayout = {
-          ...state.layout,
-          leftPaneArrow: "◀",
-          leftPaneFlex: 0.2,
-          leftPaneMinSize: 150,
-          leftPaneMaxSize: 500,
-          leftPaneMinimized: false,
-          middlePaneFlex: state.layout.middlePaneFlex - 0.2,
-        };
-        const newState = {
-          ...state,
-          layout: { ...state.layout, ...newLayout },
-        };
-        dispatch({ type: "expandLeftMenu", newState });
-      }
-    }
-  }, [state.layout.subMenuCurrentComponent]);
+  // useEffect(() => {
+  //   if (Object.entries(state).length) {
+  //     if (state.layout.leftPaneMinimized) {
+  //       const newLayout = {
+  //         ...state.layout,
+  //         leftPaneArrow: "◀",
+  //         leftPaneFlex: 0.2,
+  //         leftPaneMinSize: 150,
+  //         leftPaneMaxSize: 500,
+  //         leftPaneMinimized: false,
+  //         middlePaneFlex: state.layout.middlePaneFlex - 0.2,
+  //       };
+  //       const newState = {
+  //         ...state,
+  //         layout: { ...state.layout, ...newLayout },
+  //       };
+  //       dispatch({ type: "expandPane", newState });
+  //     }
+  //   }
+  // }, [state.layout.subMenuCurrentComponent]);
+
 
   /******************************************** */
   // useEffect(() => console.log(state),[state])
 
 
   return (
-    <AppContext.Provider value={{...state,sendMessage,goToSubMenu,updateLayers,sendBackMapView}}>
+    <AppContext.Provider value={{...state,sendMessage,goToSubMenu,goToBottomPane,updateLayers,updateTargetLayers,sendBackMapView}}>
     <div className="app" content={"abc"}>
       <Head>
         <title>جي بورتال</title>
@@ -242,6 +253,7 @@ export default function Home() {
           </ReflexElement>
 
           <ReflexSplitter
+          className="vertical-reflex-spilitter"
             onStartResize={() =>
               dispatch({ type: "resizeMenu", dragStatus: "start" })
             }
@@ -250,25 +262,30 @@ export default function Home() {
             }
           >
             <MinimizeMenu
+            vertical={true}
               Onducked={(event) =>
                 dispatch({ type: "toggleMenus", event, side: "left" })
               }
               arrow={state.layout.leftPaneArrow}
             />
           </ReflexSplitter>
-
+          <ReflexElement 
+          flex={state.layout.middlePaneFlex}
+          style={{transition: state.layout.animationOn ? "0.5s ease-in" : "none",}}>
+          <ReflexContainer
+          orientation="horizontal"
+          >
           <ReflexElement
-            className="middle-pane"
+            className="map-pane"
+            flex={state.layout.mapPaneFlex}
             style={{
               transition: state.layout.animationOn ? "0.5s ease-in" : "none",
             }}
-            flex={state.layout.middlePaneFlex}
-            minSize={state.layout.middlePaneMinSize}
           >
             <Suspense fallback={<Loading />}>
               <MainMap />
             </Suspense>
-            {messagesDone || (
+            {!messagesDone && (
               <MessagesContainer
                 messages={messages}
                 updateMessageStatus={(id) =>
@@ -277,8 +294,8 @@ export default function Home() {
               />
             )}
           </ReflexElement>
-
           <ReflexSplitter
+          className="horizontal-reflex-spilitter"
             onStartResize={(event) =>
               dispatch({ type: "resizeMenu", dragStatus: "start" })
             }
@@ -287,6 +304,49 @@ export default function Home() {
             }
           >
             <MinimizeMenu
+          vertical={false}
+              Onducked={(event) =>
+                dispatch({ type: "toggleMenus", event, side: "bottom" })
+              }
+              arrow={state.layout.bottomPaneArrow}
+            />
+          </ReflexSplitter>
+          <ReflexElement
+            className="bottom-pane"
+            flex={state.layout.bottomPaneFlex}
+            style={{
+              transition: state.layout.animationOn ? "0.5s ease-in" : "none",
+            }}
+            maxSize={state.layout.bottomPaneMaxSize}
+          >
+             <BottomPane
+              currentComponent={state.layout.bottomPaneCurrentComponent}
+              {...state}
+              goBack={(previousComponent) =>
+                dispatch({ type: "goToPreBottomPane", previousComponent })
+              }
+              addWidget={(widgetName) =>
+                dispatch({ type: "addWidget", widgetName })
+              }
+              sendBackWidget={(widget) =>
+                dispatch({ type: "sendBackWidget", widget })
+              }
+            />
+
+          </ReflexElement>
+          </ReflexContainer>
+          </ReflexElement>
+          <ReflexSplitter
+          className="vertical-reflex-spilitter"
+            onStartResize={(event) =>
+              dispatch({ type: "resizeMenu", dragStatus: "start" })
+            }
+            onStopResize={(event) =>
+              dispatch({ type: "resizeMenu", dragStatus: "end" })
+            }
+          >
+            <MinimizeMenu
+            vertical={true}
               Onducked={(event) =>
                 dispatch({ type: "toggleMenus", event, side: "right" })
               }

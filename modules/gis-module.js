@@ -1,4 +1,4 @@
-const supportedLayerTypes = ["csv", "feature", "geojson"]
+export const supportedLayerTypes = ["csv", "feature", "geojson"]
 export function listSupportedLayers(layers,geometry=null) {
     return geometry? 
     layers.map((layer, index) => {
