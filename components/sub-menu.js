@@ -28,6 +28,7 @@ const ClipAnalysis = React.lazy(() => import('./widgets/clip-analysis'))
 const MeasureArea = React.lazy(() => import('./widgets/measure-area'))
 const MeasureDistance = React.lazy(() => import('./widgets/measure-distance'))
 const CoordinateConversion = React.lazy(() => import('./widgets/coordinate-conversion'))
+const LabelManager = React.lazy(() => import('./widgets/label-manager'))
 
 
 const components = {
@@ -54,6 +55,7 @@ const components = {
   MeasureArea:MeasureArea,
   MeasureDistance:MeasureDistance,
   CoordinateConversion:CoordinateConversion,
+  LabelManager:LabelManager,
   Bookmarks:Bookmarks,
   Pane4: HTML_ELEMENTS_TEMPLATES,
   GPortalInfo:GPortalInfo,

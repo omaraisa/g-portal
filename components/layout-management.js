@@ -17,7 +17,7 @@ export const defaultLayout = {
   bottomPaneMaxSize: 1,
   bottomPaneMinimized: true,
   animationOn: false,
-  subMenuCurrentComponent: "ClipAnalysis",
+  subMenuCurrentComponent: "LabelManager",
   bottomPaneCurrentComponent: "DefaultBottomPane",
 };
 

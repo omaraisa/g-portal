@@ -33,6 +33,11 @@ export default function Tools() {
       class: "esri-icon-basemap",
       id: "Basemap",
     },
+    {
+      name: "مدير النصوص",
+      class: "esri-icon-labels",
+      id: "LabelManager",
+    },
   ];
   function toggleTool(id, state) {
     goToSubMenu(id)

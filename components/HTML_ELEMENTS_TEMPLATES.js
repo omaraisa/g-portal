@@ -41,7 +41,7 @@ export default function HTML_ELEMENTS_TEMPLATES(props) {
         <option value="5">Option 5</option>
       </select>
 
-      
+
       <input type="checkbox" id="switch" className="switch-input" />
       <label htmlFor="switch" className="switch-lable">
         Toggle
@@ -101,6 +101,14 @@ export default function HTML_ELEMENTS_TEMPLATES(props) {
         <span className="label">الاسم</span>
         <span className="focus-bg"></span>
       </label>
+
+      <label htmlFor="plainInput">أدخل الرابط</label>
+      <input
+        className="inputText"
+        type="text"
+        id="plainInput"
+        onChange={() => console.log("fired")}
+      ></input>
 
       <textarea name="" id="" cols="30" rows="3"></textarea>
     </div>

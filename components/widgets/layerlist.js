@@ -5,7 +5,7 @@ import * as GIS from "../../modules/gis-module";
 
 let LayerListWidget,layerIndex;
 export default function LayerListComponent({ sendBackWidget }) {
-  const { map, view,updateTargetLayers,goToBottomPane } = useContext(AppContext);
+  const { map, view,updateTargetLayers,goToSubMenu,goToBottomPane } = useContext(AppContext);
   const LayerListRef = useRef();
   const styles = {
     container: {
@@ -43,6 +43,12 @@ export default function LayerListComponent({ sendBackWidget }) {
                 className: "esri-icon-table",
                 id: "attributeTable",
               },
+              {
+                    //title: "labeling",
+                    title: "النصوص",
+                    className: "esri-icon-labels",
+                    id: "labeling",
+                  },
             ],
             //   {
             //     //title: "Attribute Table",
@@ -58,12 +64,7 @@ export default function LayerListComponent({ sendBackWidget }) {
             //     className: "esri-icon-maps",
             //     id: "symbology",
             //   },
-            //   {
-            //     //title: "labeling",
-            //     title: "النصوص",
-            //     className: "esri-icon-labels",
-            //     id: "labeling",
-            //   },
+            //  
             //   {
             //     //title: "Popup Window",
             //     title: "النافذة المنبثقة",
@@ -106,6 +107,7 @@ export default function LayerListComponent({ sendBackWidget }) {
         const actionTrigger = {
           fullExtent : () => fullExtent(),
           symbology : () => symbology(),
+          labeling : () => labeling(),
           attributeTable : () => attributeTable(),
           exportData : () => exportData(),
           popup : () => popup(),
@@ -120,6 +122,13 @@ export default function LayerListComponent({ sendBackWidget }) {
         }
         function information() {
           window.open(selectedLayer.url);
+        }
+        function labeling() {
+          if(GIS.supportedLayerTypes.includes(selectedLayer.type))
+          {
+           updateTargetLayers({labelingTargetLayer:selectedLayer})
+           goToSubMenu("LabelManager")            
+         }
         }
         function symbology() {
 
