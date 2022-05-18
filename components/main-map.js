@@ -5,6 +5,7 @@ import styles from "./main-map.module.css";
 import { AppContext } from "../pages";
 import FeatureLayer from "@arcgis/core/layers/FeatureLayer";
 import GeoJSONLayer from "@arcgis/core/layers/GeoJSONLayer";
+import CSVLayer from "@arcgis/core/layers/CSVLayer";
 let map,view
 export default function MainMap() {
   const { sendMessage, sendBackMapView, updateLayers } = useContext(AppContext);
@@ -14,7 +15,7 @@ export default function MainMap() {
       basemap: "topo-vector"
     });
     view = new MapView({
-      zoom:6,
+      zoom:1,
       center: [32,15],
       ui : {
           components : ["zoom","compass","ScaleBar"]
@@ -42,7 +43,12 @@ export default function MainMap() {
         var polygons = new GeoJSONLayer({
           url: "https://mygportalstorage.blob.core.windows.net/layerscontainer/1651077414949.json",
           });
-          map.add(polygons);
+          // map.add(polygons);
+        var earthquake = new CSVLayer({
+          url: "https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/4.5_week.csv",
+          });
+          // map.add(earthquake);
+          
       })
       .catch((e) =>{
       console.log(e)

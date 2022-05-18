@@ -80,12 +80,14 @@ export default function AddMapService() {
     };
 
     const loadingTrigger = {
-      loaded: () =>
+      loaded: () => {
         layerLoadingAction(
           "info",
           "إضافة طبقة",
           "تم إضافة الطبقة إلى الخريطة بنجاح"
-        ),
+        )
+        urlRef.current.value = ""
+      },
       failed: () =>
         layerLoadingAction(
           "error",

@@ -32,7 +32,7 @@ export default function HTML_ELEMENTS_TEMPLATES(props) {
       <button className="button darkBtn">darkBtn</button>
       <button className="button roundBtn">roundBtn</button>
 
-      <select className="select" required>
+      <select className="select" >
         <option value="" hidden>اختر</option>
         <option value="1">Option 1</option>
         <option value="2">Option 2</option>

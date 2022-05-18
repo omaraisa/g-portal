@@ -76,7 +76,8 @@ export default function StatisticalAnalysis() {
       state.targetLayer
         .queryFeatures(query)
         .then(function (response) {
-          setState({...state,statisticsResult: response.features[0].attributes[outputField]})
+          const statisticsResult = Object.values(response.features[0].attributes)[0]
+          setState({...state,statisticsResult:statisticsResult })
         })
         .catch((error) => {
           sendErrorMessage("حدث خطأ أثناء العملية الرجاء المحاولة مرة أخرى");
@@ -109,7 +110,7 @@ export default function StatisticalAnalysis() {
         <i className="esri-icon-cursor-marquee"></i>
         تحديد المعالم
       </button>
-      {state.statisticsResult && 
+      {state.statisticsResult !== null && state.statisticsResult !== "" &&
       <div className="flex-column-container" style={{backgroundColor:"#b3dd9a"}}>
       <b>النتيجة</b>
       <span style={{textAlign:"center",fontSize:"2rem",fontWeight:"bolder"}}>{state.statisticsResult}</span>

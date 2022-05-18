@@ -780,3 +780,11 @@ textarea {
 .info-text {
   font-size: 1.2rem;
 }
+
+.esri-layer-list__item-action-title {
+  margin-right: 5px;
+}
+
+.esri-ui .esri-popup {
+  direction: ltr;
+}

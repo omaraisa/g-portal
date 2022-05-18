@@ -29,6 +29,11 @@ export default function Tools() {
       id: "Editor",
     },
     {
+      name: "النوافذ المنبثقة",
+      class: "esri-icon-configure-popup",
+      id: "PopupManager",
+    },
+    {
       name: "خرائط الأساس",
       class: "esri-icon-basemap",
       id: "Basemap",
@@ -38,16 +43,21 @@ export default function Tools() {
       class: "esri-icon-labels",
       id: "LabelManager",
     },
+    {
+      name: "مدير التمثيل",
+      class: "esri-icon-maps",
+      id: "SymbologyManager",
+    },
   ];
   function toggleTool(id, state) {
     goToSubMenu(id)
     setState({ ...state, activeTool:id});
   }
   useEffect(() => {
-    toolSet.forEach(tool =>{
-      if(layout.subMenuCurrentComponent === tool.id)
-      setState({ ...state, activeTool:tool.id});
-    })
+   const thereIsActiveTool =  toolSet.some(tool =>layout.subMenuCurrentComponent === tool.id)
+   thereIsActiveTool
+   ? setState({ ...state, activeTool:layout.subMenuCurrentComponent})
+   : setState({ ...state, activeTool:null})
   },[layout])
 
   return (

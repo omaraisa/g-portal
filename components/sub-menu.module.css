@@ -6,4 +6,5 @@
     align-items:stretch;
     flex-flow: column wrap;
     gap: .5rem;
+    overflow-y: auto;
 }

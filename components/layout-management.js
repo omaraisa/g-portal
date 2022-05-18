@@ -17,7 +17,7 @@ export const defaultLayout = {
   bottomPaneMaxSize: 1,
   bottomPaneMinimized: true,
   animationOn: false,
-  subMenuCurrentComponent: "LabelManager",
+  subMenuCurrentComponent: "SaveMap",
   bottomPaneCurrentComponent: "DefaultBottomPane",
 };
 

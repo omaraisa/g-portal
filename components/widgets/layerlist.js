@@ -3,9 +3,44 @@ import LayerList from "@arcgis/core/widgets/LayerList";
 import { AppContext } from "../../pages";
 import * as GIS from "../../modules/gis-module";
 
-let LayerListWidget,layerIndex;
+let LayerListWidget, layerIndex;
+const featureOptions = [
+  {
+    //title: "Go to full extent",
+    title: "عرض كامل البيانات",
+    className: "esri-icon-zoom-out-fixed",
+    id: "fullExtent",
+  },
+  {
+    //title: "Attribute Table",
+    title: "البيانات الوصفية",
+    className: "esri-icon-table",
+    id: "attributeTable",
+  },
+  {
+    //title: "labeling",
+    title: "النصوص",
+    className: "esri-icon-labels",
+    id: "labeling",
+  },
+  {
+    //title: "Popup Window",
+    title: "النافذة المنبثقة",
+    className: "esri-icon-configure-popup",
+    id: "popup",
+  },
+    {
+      //title: "Symbology",
+      title: "التمثيل",
+      className: "esri-icon-maps",
+      id: "symbology",
+    },
+]
+const rasterOptions = []
+
 export default function LayerListComponent({ sendBackWidget }) {
-  const { map, view,updateTargetLayers,goToSubMenu,goToBottomPane } = useContext(AppContext);
+  const { map, view, updateTargetLayers, goToSubMenu, goToBottomPane } =
+    useContext(AppContext);
   const LayerListRef = useRef();
   const styles = {
     container: {
@@ -28,95 +63,50 @@ export default function LayerListComponent({ sendBackWidget }) {
             open: false,
             visible: true,
           };
-
-          item.actionsSections = [
-            [
-              {
-                //title: "Go to full extent",
-                title: "عرض كامل البيانات",
-                className: "esri-icon-zoom-out-fixed",
-                id: "fullExtent",
-              },
-              {
-                //title: "Attribute Table",
-                title: "البيانات الوصفية",
-                className: "esri-icon-table",
-                id: "attributeTable",
-              },
-              {
-                    //title: "labeling",
-                    title: "النصوص",
-                    className: "esri-icon-labels",
-                    id: "labeling",
-                  },
-            ],
-            //   {
-            //     //title: "Attribute Table",
-            //     title: "استخراج البيانات",
-            //     className: "esri-icon-download",
-            //     id: "exportData",
-            //   },
-            // ],
-            // [
-            //   {
-            //     //title: "Symbology",
-            //     title: "التمثيل",
-            //     className: "esri-icon-maps",
-            //     id: "symbology",
-            //   },
-            //  
-            //   {
-            //     //title: "Popup Window",
-            //     title: "النافذة المنبثقة",
-            //     className: "esri-icon-configure-popup",
-            //     id: "popup",
-            //   },
-            // ],
-            [
-              {
-                //title: "Move Up",
-                title: "التحريك لأعلى",
-                className: "esri-icon-up-arrow",
-                id: "moveUp",
-              },
-              {
-                //title: "Move Down",
-                title: "التحريك لأسفل",
-                className: "esri-icon-down-arrow",
-                id: "moveDown",
-              },
-            ],
-            [
-              {
-                //title: "Delete Layer",
-                title: "حذف الطبقة",
-                className: "esri-icon-close",
-                id: "deleteLayer",
-              },
-            ],
-          ];
-
-          //}
+            item.actionsSections = [
+              GIS.supportedLayerTypes.includes(event.item.layer.type) && featureOptions,
+              [
+                {
+                  //title: "Move Up",
+                  title: "التحريك لأعلى",
+                  className: "esri-icon-up-arrow",
+                  id: "moveUp",
+                },
+                {
+                  //title: "Move Down",
+                  title: "التحريك لأسفل",
+                  className: "esri-icon-down-arrow",
+                  id: "moveDown",
+                },
+              ],
+              [
+                {
+                  //title: "Delete Layer",
+                  title: "حذف الطبقة",
+                  className: "esri-icon-close",
+                  id: "deleteLayer",
+                },
+              ],
+            ];
         },
       });
 
       LayerListWidget.on("trigger-action", function (event) {
-        let id = event.action.id;
+        const id = event.action.id;
         const selectedLayer = event.item.layer;
-        //console.log(selectedLayer.type)
         const actionTrigger = {
-          fullExtent : () => fullExtent(),
-          symbology : () => symbology(),
-          labeling : () => labeling(),
-          attributeTable : () => attributeTable(),
-          exportData : () => exportData(),
-          popup : () => popup(),
-          moveUp : () => moveUp(),
-          moveDown : () => moveDown(),
-          deleteLayer : () => deleteLayer(),
-        }
-        actionTrigger[id]()
-        
+          fullExtent: () => fullExtent(),
+          symbology: () => symbology(),
+          labeling: () => labeling(),
+          attributeTable: () => attributeTable(),
+          exportData: () => exportData(),
+          popup: () => popup(),
+          moveUp: () => moveUp(),
+          moveDown: () => moveDown(),
+          deleteLayer: () => deleteLayer(),
+        };
+        actionTrigger[id]();
+
         function fullExtent() {
           view.goTo(selectedLayer.fullExtent);
         }
@@ -124,27 +114,21 @@ export default function LayerListComponent({ sendBackWidget }) {
           window.open(selectedLayer.url);
         }
         function labeling() {
-          if(GIS.supportedLayerTypes.includes(selectedLayer.type))
-          {
-           updateTargetLayers({labelingTargetLayer:selectedLayer})
-           goToSubMenu("LabelManager")            
-         }
+            updateTargetLayers({ labelingTargetLayer: selectedLayer });
+            goToSubMenu("LabelManager");
         }
         function symbology() {
-
+            updateTargetLayers({ symbologyTargetLayer: selectedLayer });
+            goToSubMenu("SymbologyManager");
         }
         function attributeTable() {
-          if(GIS.supportedLayerTypes.includes(selectedLayer.type))
-           {
-            updateTargetLayers({FeatureTableLayer:selectedLayer})
-            goToBottomPane("FeatureTable")            
-          }
+            updateTargetLayers({ FeatureTableLayer: selectedLayer });
+            goToBottomPane("FeatureTable");
         }
-        function exportData() {
-
-        }
+        function exportData() {}
         function popup() {
-
+          updateTargetLayers({ popupTargetLayer: selectedLayer });
+          goToSubMenu("PopupManager");
         }
         function moveUp() {
           getLayerIndex(selectedLayer.id);
@@ -157,23 +141,21 @@ export default function LayerListComponent({ sendBackWidget }) {
         function deleteLayer() {
           map.remove(selectedLayer);
         }
-        
       });
 
       function getLayerIndex(id) {
-        let layers = map.layers.items;
+        const layers = map.layers.items;
         layers.forEach(matchID);
 
         function matchID(layer, index) {
           if (id === layer.id) {
             layerIndex = index;
-            //console.log(layerIndex)
           }
         }
       }
 
       function moveLayerUp(layer) {
-        let maxIndex = map.layers.length;
+        const maxIndex = map.layers.length;
         if (layerIndex < maxIndex) {
           map.reorder(layer, layerIndex + 1);
         }

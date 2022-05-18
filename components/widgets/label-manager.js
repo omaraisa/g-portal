@@ -127,7 +127,6 @@ export default function LabelManager() {
               previousLabelProps,
               state
             );
-        // clearRemovedLayersLabels(state);
         layerSelectorRef.current.value = targetLayer.id;
       } catch (error) {
         sendErrorMessage(
@@ -259,7 +258,7 @@ export default function LabelManager() {
     const currentLabelProps = { ...state.currentLabelProps };
     currentLabelProps[property] = newValue;
     setState({ ...state, currentLabelProps });
-    
+
     } catch (error) {
       sendErrorMessage("عفواً فشلت عملية تعديل خصائص النصوص، الرجاء المحاولة مرة أخرى")
       console.log(error)
@@ -384,7 +383,7 @@ export default function LabelManager() {
         <div
           className="flex-column-container"
           style={{ marginTop: "2rem", gap: "4rem" }}
-        >
+        >حجم الخط والاطار
           <div ref={fontSizeSliderDiv}></div>
           <div ref={haloSizeSliderDiv}></div>
         </div>

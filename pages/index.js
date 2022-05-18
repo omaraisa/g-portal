@@ -3,6 +3,7 @@ Editing scratch layer
 stop editing
 add zip shp
 reducer switch
+effect undo function
 */
 import React, { Suspense } from "react";
 import Head from "next/head";
@@ -43,6 +44,13 @@ export default function Home() {
     layers: [],
     widgets: {},
     targetLayers: {},
+    mapDefinition:{
+      Source: "GPortal Map",
+      Developer:"gis-gate.com",
+      CopyRights: "GPortal",
+      Usage:"This file has been exported from a Gportal Map. It can be used by importing it to the platform",
+      layerSources: [],      
+    },
   };
   
   function reducer(state, action) {
@@ -143,6 +151,10 @@ export default function Home() {
               const layers = action.layers;
               return { ...state, layers };
 
+            case "updateLayerSources":
+              const layerSources = action.layerSources;
+              return { ...state, mapDefinition:{...state.mapDefinition,layerSources} };
+
       case "updateTargetLayers":
         const targetLayers = {...state.targetLayers,...action.layer}
         return {...state,targetLayers}
@@ -164,6 +176,7 @@ export default function Home() {
   const goToSubMenu = (targetComponent) =>dispatch({ type: "goToSubMenu", targetComponent })
   const goToBottomPane = (targetComponent) =>dispatch({ type: "goToBottomPane", targetComponent })
   const updateLayers = (layers) =>dispatch({ type: "updateLayers", layers })
+  const updateLayerSources = (layerSources) =>dispatch({ type: "updateLayerSources", layerSources })
   const updateTargetLayers = (layer) =>dispatch({ type: "updateTargetLayers", layer})
   const sendBackMapView= (map, view) =>dispatch({ type: "sendBackMapView", map, view })
 
@@ -199,11 +212,11 @@ export default function Home() {
 
 
   /******************************************** */
-  // useEffect(() => console.log(state),[state])
+  useEffect(() => console.log(state),[state])
 
 
   return (
-    <AppContext.Provider value={{...state,sendMessage,goToSubMenu,goToBottomPane,updateLayers,updateTargetLayers,sendBackMapView}}>
+    <AppContext.Provider value={{...state,sendMessage,goToSubMenu,goToBottomPane,updateLayers,updateLayerSources,updateTargetLayers,sendBackMapView}}>
     <div className="app" content={"abc"}>
       <Head>
         <title>جي بورتال</title>

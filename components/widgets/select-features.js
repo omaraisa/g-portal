@@ -11,18 +11,6 @@ let sketchGraphic = new GraphicsLayer({
   listMode: "hide",
 });
 
-let sketch = new Sketch({
-  layer: sketchGraphic,
-  availableCreateTools: ["polygon", "rectangle", "circle"],
-  creationMode: "single",
-  visibleElements : {
-    selectionTools:{
-      "rectangle-selection":false,
-      "lasso-selection": false
-    },
-    settingsMenu: false
-  }
-});
 
 export default function SelectFeatures() {
   const { map, view, layers, sendMessage } = useContext(AppContext);
@@ -47,8 +35,20 @@ export default function SelectFeatures() {
 
   useEffect(() => {
     if (view && !state.sketchInitialized) {
-      sketch.container = sketchContainerRef.current;
-      sketch.view = view;
+      let sketch = new Sketch({
+        layer: sketchGraphic,
+        container:sketchContainerRef.current,
+        view,
+        availableCreateTools: ["polygon", "rectangle", "circle"],
+        creationMode: "single",
+        visibleElements : {
+          selectionTools:{
+            "rectangle-selection":false,
+            "lasso-selection": false
+          },
+          settingsMenu: false
+        }
+      });
       sketch.on("create", ({ graphic, state }) => {
         if (state === "complete") {
           runQuery({

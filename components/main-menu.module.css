@@ -4,4 +4,5 @@
     background: url('../public/images/gis_analysis.jpg') no-repeat;
     background-size: clamp(100%, 400px, 600px) auto;
     background-position:bottom;
+    overflow-y: auto;
 }
