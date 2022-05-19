@@ -14,6 +14,10 @@ export default function SaveMap() {
   function saveMap(state) {
     mapDefinition.extent = view.extent;
     mapDefinition.basemap = map.basemap;
+    mapDefinition.Source= "GPortal Map"
+    mapDefinition.Developer="gis-gate.com"
+    mapDefinition.CopyRights= "GPortal"
+    mapDefinition.Usage="This file has been exported from a Gportal Map. It can be used by importing it to the platform"
     const layerSources = generateLayerSources();
 
     Promise.all(layerSources).then((response) => {

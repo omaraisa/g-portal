@@ -1,15 +1,15 @@
 export const defaultLayout = {
-  leftPaneArrow: "◀",
-  leftPaneFlex: 0.2,
-  leftPaneMinSize: 150,
-  leftPaneMaxSize: 500,
-  leftPaneMinimized: false,
+  leftPaneArrow: "▶",
+  leftPaneFlex: 0,
+  leftPaneMinSize: 0,
+  leftPaneMaxSize: 1,
+  leftPaneMinimized: true,
   rightPaneArrow: "▶",
   rightPaneFlex: 0.2,
   rightPaneMinSize: 300,
   rightPaneMaxSize: 500,
   rightPaneMinimized: false,
-  middlePaneFlex: 0.6,
+  middlePaneFlex: 0.8,
   middlePaneMinSize: 600,
   mapPaneFlex:1,
   bottomPaneFlex:0,
@@ -17,8 +17,8 @@ export const defaultLayout = {
   bottomPaneMaxSize: 1,
   bottomPaneMinimized: true,
   animationOn: false,
-  subMenuCurrentComponent: "SaveMap",
-  bottomPaneCurrentComponent: "DefaultBottomPane",
+  subMenuCurrentComponent: "DefaultPane",
+  bottomPaneCurrentComponent: "DefaultPane",
 };
 
 export const LayoutManager = (state,action) => {
@@ -123,10 +123,22 @@ export const LayoutManager = (state,action) => {
           leftPaneMinimized: false,
           middlePaneFlex: state.layout.middlePaneFlex - 0.2,
     }
+    const minimizePaneProps = {
+          leftPaneArrow: "▶",
+          leftPaneFlex: 0,
+          leftPaneMinSize: 0,
+          leftPaneMaxSize: 1,
+          leftPaneMinimized: true,
+          middlePaneFlex: state.layout.middlePaneFlex + 0.2,
+    }
 
     let newLayout = {...state.layout,subMenuCurrentComponent:targetComponent}
+    
     if (state.layout.leftPaneMinimized) 
     newLayout = {...newLayout,...expandPaneProps}
+
+    if (targetComponent === 'DefaultPane') 
+    newLayout = {...newLayout,...minimizePaneProps}
 
     return {...state,layout:newLayout} 
 

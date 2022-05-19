@@ -14,6 +14,7 @@ import GPortalInfo from "./widgets/gportal-info";
 import HTML_ELEMENTS_TEMPLATES from "./HTML_ELEMENTS_TEMPLATES";
 import React, { Suspense } from "react";
 import Loading from "./sub_components/loading";
+import DefaultPane from "./sub_components/default-pane";
 const Print = React.lazy(() => import('./widgets/print'))
 const Editor = React.lazy(() => import('./widgets/editor'))
 const Basemap = React.lazy(() => import('./widgets/basemap'))
@@ -64,6 +65,7 @@ const components = {
   SymbologyManager:SymbologyManager,
   SaveMap:SaveMap,
   OpenMap:OpenMap,
+  DefaultPane:DefaultPane,
   Bookmarks:Bookmarks,
   Pane4: HTML_ELEMENTS_TEMPLATES,
   GPortalInfo:GPortalInfo,

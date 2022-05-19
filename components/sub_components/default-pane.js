@@ -1,4 +1,4 @@
-export default function DefaultBottomPane() {
+export default function DefaultPane() {
   const styles = {
     container: {
       height: "100%",

@@ -1,8 +1,8 @@
 /* Main Issues
 Editing scratch layer
-stop editing
+second click on active header hides submenu
+stop editing cancelWorkflow()
 add zip shp
-reducer switch
 effect undo function
 */
 import React, { Suspense } from "react";
@@ -45,80 +45,11 @@ export default function Home() {
     widgets: {},
     targetLayers: {},
     mapDefinition:{
-      Source: "GPortal Map",
-      Developer:"gis-gate.com",
-      CopyRights: "GPortal",
-      Usage:"This file has been exported from a Gportal Map. It can be used by importing it to the platform",
       layerSources: [],      
     },
   };
   
   function reducer(state, action) {
-//     console.log("action ", action.type)
-    
-//     const sendBackMapView = () => {  
-//       const map = action.map;
-//       const view = action.view;
-//       if (Object.keys(map).length) return { ...state, map, view };
-//       return state;
-//     }  
-    
-//     const sendBackWidget = () => {
-//  const widget = action.widget;     
-//         if (Object.keys(widget).length) {
-//           const widgets = { ...state.widgets, ...widget };
-//           return { ...state, widgets };
-//         }  
-//         return state;
-//     }    
-    
-//     const LayoutManagement = () => {
-//       const LayoutResponse = LayoutManager(state, action);
-//       if (LayoutResponse.type === "error") {
-//         sendMessage(LayoutResponse);
-//         return state;
-//       } else return LayoutResponse;  
-//     }  
-    
-//     const expandPane = () => {
-//       if (Object.entries(action.newState).length) return action.newState;
-//       return state;
-//     }      
-    
-//     const goToSubMenu = () => {
-//       console.log("fired")
-//       if(action.targetComponent)
-//       return {...state,layout:{...state.layout,subMenuCurrentComponent:action.targetComponent}}
-//       return state
-//     }  
-    
-    
-    
-//     const actionNavigator = {
-//       sendBackMapView : sendBackMapView,
-//       sendBackWidget : sendBackWidget,
-//       goToSubMenu:LayoutManagement,
-//       changeLayout:LayoutManagement,
-//       goToPreSubMenu:LayoutManagement,
-//       resizeMenu:LayoutManagement,
-//       toggleMenus:LayoutManagement,
-//       expandPane : expandPane,
-//       goToSubMenu : goToSubMenu,     
-//     }  
-    
-//     const defaultAction = () => {
-//       sendMessage({
-//         type: "error",
-//         title: "إجراء خاطئ",
-//         body: "لم يتم العثور على الإجراء المطلوب",
-//       });
-//       return state;
-//     }
-
-//     actionNavigator[action.type]? actionNavigator[action.type]() : defaultAction()
-       
-    
-
     switch (action.type) {
       case "sendBackMapView":
         const map = action.map;
@@ -161,7 +92,6 @@ export default function Home() {
 
       case "expandPane":
         return action.newState;
-        // return state;
 
         default:
         sendMessage({
@@ -187,31 +117,8 @@ export default function Home() {
     setMessagesDone(allMessagesCleared);
   }, [messages]);
 
-  
 
-  // useEffect(() => {
-  //   if (Object.entries(state).length) {
-  //     if (state.layout.leftPaneMinimized) {
-  //       const newLayout = {
-  //         ...state.layout,
-  //         leftPaneArrow: "◀",
-  //         leftPaneFlex: 0.2,
-  //         leftPaneMinSize: 150,
-  //         leftPaneMaxSize: 500,
-  //         leftPaneMinimized: false,
-  //         middlePaneFlex: state.layout.middlePaneFlex - 0.2,
-  //       };
-  //       const newState = {
-  //         ...state,
-  //         layout: { ...state.layout, ...newLayout },
-  //       };
-  //       dispatch({ type: "expandPane", newState });
-  //     }
-  //   }
-  // }, [state.layout.subMenuCurrentComponent]);
-
-
-  /******************************************** */
+  /*********************************************/
   useEffect(() => console.log(state),[state])
 
 

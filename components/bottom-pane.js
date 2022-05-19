@@ -1,10 +1,10 @@
-import DefaultBottomPane from "./sub_components/default-bottom-pane";
+import DefaultPane from "./sub_components/default-pane";
 import React, { Suspense } from "react";
 import Loading from "./sub_components/loading";
 const FeatureTable = React.lazy(() => import('./widgets/feature-table'))
 
 const components = {
-  DefaultBottomPane: DefaultBottomPane,
+  DefaultPane: DefaultPane,
   FeatureTable:FeatureTable,
 };
 const bottomPanePreviousComponents = {
