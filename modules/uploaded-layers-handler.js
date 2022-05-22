@@ -1,11 +1,13 @@
-import CSVLayer from "@arcgis/core/layers/CSVLayer";
 import FeatureLayer from "@arcgis/core/layers/FeatureLayer";
 import GeoJSONLayer from "@arcgis/core/layers/GeoJSONLayer";
 import KMLLayer from "@arcgis/core/layers/KMLLayer";
 import Graphic from "@arcgis/core/Graphic";
+import Geometry from "@arcgis/core/geometry/Geometry";
+import * as GIS from "./gis-module";
 // import csvToJson from "convert-csv-to-json/src/csvToJson";
 import * as XLSX from "xlsx";
 import { BlobServiceClient } from "@azure/storage-blob";
+import axios from "axios";
 
 const containerName = "layerscontainer";
 const sasToken =
@@ -34,7 +36,7 @@ const createBlobInContainer = async (containerClient, file, uploadName) => {
   await blobClient.uploadBrowserData(file, options);
 };
 
-let XYFeatures = []
+let XYFeatures = [];
 const uploadedLayersHandler = async ({
   layerInfo,
   fileSelected,
@@ -45,15 +47,9 @@ const uploadedLayersHandler = async ({
   goBack,
 }) => {
   return new Promise((resolve, reject) => {
-    const {
-      fileName,
-      uploadName,
-      fileType,
-      XYColumns,
-      xField,
-      yField,
-    } = layerInfo
-    const { map, view, widgets, sendMessage} = appContext
+    const { fileName, uploadName, fileType, XYColumns, xField, yField } =
+      layerInfo;
+    const { map, view, widgets, sendMessage } = appContext;
     const layersHandler = {
       json: () => geojsonLayerHandler(),
       geojson: () => geojsonLayerHandler(),
@@ -63,14 +59,9 @@ const uploadedLayersHandler = async ({
       xlsx: () => XYLayerHandler(),
       csv: () => XYLayerHandler(),
       txt: () => XYLayerHandler(),
+      zip: () => zipShpLayerHandler(),
       preparedLayer: () => addXYLayer(),
     };
-
-    async function csvLayerHandler() {
-      const uploadedFile = await uploadFileToBlob(fileSelected, uploadName);
-      const csvLayer = new CSVLayer({ url: uploadedFile, title: fileName });
-      addLayerToMap(csvLayer);
-    }
 
     async function geojsonLayerHandler() {
       const uploadedFile = await uploadFileToBlob(fileSelected, uploadName);
@@ -118,7 +109,7 @@ const uploadedLayersHandler = async ({
       let reader = new FileReader();
       reader.readAsBinaryString(fileSelected);
       reader.onload = async function (e) {
-      XYFeatures = await processXYData(e.target.result);
+        XYFeatures = await processXYData(e.target.result);
         if (await XYFeatures) {
           const XYColumns = Object.keys(await XYFeatures[0]);
           toggleXYForm(XYColumns);
@@ -129,36 +120,15 @@ const uploadedLayersHandler = async ({
             body: `عفواً، فشلت عملية معالجة الملف الرجاء التأكد من صحة البيانات`,
           });
         }
-
       };
 
       // return new GeoJSONLayer({url: uploadedFile,title:fileName});
     }
 
-    function addXYLayer() {
-      const fields = [];
-      const fieldInfos = [];
-      const layerSource = [];
-      XYColumns.forEach((column) => {
-        let columnType = "string";
-        for (let feature of XYFeatures) {
-          if (feature[column] !== null && feature[column] !== undefined) {
-            if (typeof feature[column] === "number") columnType = "double";
-            else {
-              columnType = "string";
-              break;
-            }
-          }
-        }
-        fields.push({
-          name: column,
-          type: columnType,
-        });
-        fieldInfos.push({
-          fieldName: column,
-        });
-      });
+    async function addXYLayer() {
+      const { fields, fieldInfos } = await getFields(XYColumns, XYFeatures);
 
+      const layerSource = [];
       XYFeatures.forEach((feature, index) => {
         const xLon = feature[xField];
         const yLat = feature[yField];
@@ -257,22 +227,201 @@ const uploadedLayersHandler = async ({
       });
     }
 
+    async function zipShpLayerHandler() {
+      let data = new FormData();
+      data.append("file", fileSelected, fileName);
+
+      axios
+        .post("/api/uploadshp", data, {
+          headers: {
+            Accept: "application/json, text/plain, */*",
+            "Accept-Language": "en-US,en;q=0.8",
+            "Content-Type": `multipart/form-data; boundary=${data._boundary}`,
+          },
+        })
+        .then((response) => {
+          response.data.status === "success"
+            ? initiateFeatureLayer(response.data)
+            : handleError(
+                `عفواً، فشلت عملية معالجة الملف الرجاء التأكد من صحة البيانات`
+              );
+              
+              async function initiateFeatureLayer(response) {
+            if (response.result.length === 0) {
+              handleError(`عفواً، هذه الطبقة ليس بها أي معالم`);
+              return;
+            }
+            try {
+              const XYColumns = Object.keys(response.result[0].properties);
+            const XYFeatures = response.result.map(
+              (feature) => feature.properties
+            );
+            const { fields, fieldInfos } = await getFields(
+              XYColumns,
+              XYFeatures
+            );
+
+            let popupTemplate = {
+              content: [
+                {
+                  type: "fields",
+                  fieldInfos,
+                },
+              ],
+            };
+
+            fields.push({
+              name: "ObjectID",
+              type: "oid",
+            });
+
+            let geometryType = geometryTermsCorrection[response.result[0].geometry.type];
+            
+            const symbol = GIS.symbols[geometryType];
+            symbol.color ="#" + Math.floor(Math.random() * 16777215).toString(16);
+            
+            const renderer = {
+              type: "simple",
+              symbol
+            };
+
+            const source = response.result.map((feature) => {
+              const geometry = geometryGetter[geometryType](
+                feature.geometry.coordinates
+                );
+              return new Graphic({
+                attributes: feature.properties,
+                geometry,
+              });
+            });
+
+            const shapefileLayer = new FeatureLayer({
+              title: response.layername,
+              fields,
+              source,
+              renderer,
+              geometryType,
+              popupTemplate,
+            });
+
+            addLayerToMap(shapefileLayer);
+            
+            } catch (error) {
+               handleError(`عفواً، فشلت عملية معالجة الملف الرجاء التأكد من صحة البيانات`);
+               console.log(error)
+            }
+
+            
+          }
+
+          
+        })
+        .catch((error) => {
+          handleError(
+            `عفواً، فشلت عملية ارسال البيانات الى الخادم`
+          );
+          console.log(error)
+        });
+    }
+
     try {
       resolve(layersHandler[fileType]());
     } catch (error) {
       reject(error);
     }
+
+
+    function handleError(message) {
+      loading(false);
+      cleanup();
+      sendMessage({
+        type: "error",
+        title: "معالجة طبقة Shapefile",
+        body: message,
+      });
+    }
+
   });
-}; // XYLayerHandle
+};
 
 export default uploadedLayersHandler;
+
+async function getFields(XYColumns, XYFeatures) {
+  const fields = [];
+  const fieldInfos = [];
+  XYColumns.forEach((column) => {
+    let columnType = "string";
+    for (let feature of XYFeatures) {
+      if (feature[column] !== null && feature[column] !== undefined) {
+        if (typeof feature[column] === "number") columnType = "double";
+        else {
+          columnType = "string";
+          break;
+        }
+      }
+    }
+    fields.push({
+      name: column,
+      type: columnType,
+    });
+    fieldInfos.push({
+      fieldName: column,
+    });
+  });
+  return { fields, fieldInfos };
+}
+
+const geometryGetter = {
+  point: (coordinates) => getPointGeom(coordinates),
+  polygon: (coordinates) => getPolygonGeom(coordinates),
+  polyline: (coordinates) => getlineGeom(coordinates),
+};
+
+function getPointGeom(coordinates) {
+  return {
+    latitude: coordinates[0],
+    longitude: coordinates[1],
+    type: "point",
+  };
+}
+function getPolygonGeom(coordinates) {
+  return {
+    rings: coordinates,
+    type: "polygon",
+  };
+}
+
+function getlineGeom(coordinates) {
+  return {
+    paths: coordinates,
+    type: "polyline",
+  };
+}
+
+const geometryTermsCorrection = {
+  point:"point",
+  Point:"point",
+  line:"polyline",
+  multiline:"polyline",
+  Multiline:"polyline",
+  MultiLine:"polyline",
+  Line:"polyline",
+  LineString:"polyline",
+  polyline:"polyline",
+  Polyline:"polyline",
+  polygon:"polygon",
+  Polygon:"polygon",
+  multipolygon:"polygon",
+  Multipolygon:"polygon",
+  MultiPolygon:"polygon",
+}
+
 
 export const allowedExtensions = [
   "csv",
   "txt",
   "xls",
   "xlsx",
-  "zip",
   "txt",
   "json",
   "geojson",
@@ -280,3 +429,15 @@ export const allowedExtensions = [
   "kmz",
   "zip",
 ];
+export const maximumAllowedSize = {
+  csv: 50000000,
+  txt: 50000000,
+  xls: 50000000,
+  xlsx: 50000000,
+  txt: 50000000,
+  json: 2000000,
+  geojson: 2000000,
+  kml: 2000000,
+  kmz: 2000000,
+  zip: 2000000,
+};

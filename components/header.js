@@ -5,7 +5,7 @@ import Image from "next/image";
 export default function Header(props) {
   return (
     <div className={styles.header}>
-      <Image src="/images/logo.png" alt="me" width="40" height="40" />
+      <Image src="/images/wlogo.png" alt="me" width="40" height="40" />
       <h1 className={styles.title}>جي بورتال</h1>
       <NavButton
         toolTip="تحديد المعالم"

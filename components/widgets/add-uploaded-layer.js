@@ -2,9 +2,8 @@ import { useState, useRef, useContext } from "react";
 import { AppContext } from "../../pages";
 import styles from "../sub_components/loading.module.css";
 import uploadedLayersHandler, {
-  allowedExtensions,
+  allowedExtensions,maximumAllowedSize
 } from "../../modules/uploaded-layers-handler";
-import axios from "axios";
 
 export default function AddUploadedLayer() {
   const defaultState = {
@@ -84,10 +83,11 @@ export default function AddUploadedLayer() {
   };
 
   const fileIsValid = (layer, extension) => {
+    const maximumSize = maximumAllowedSize[extension]
     const requirements = [
       {
-        condition: layer.size <= 5000000,
-        errorMessage: "عفواً، أقصى حجم مسموح به هو 5 ميقابايت",
+        condition: layer.size <= maximumSize,
+        errorMessage: `عفواً، أقصى حجم مسموح به هو ${maximumSize/1000000} ميقابايت`,
       },
       {
         condition: allowedExtensions.includes(extension),

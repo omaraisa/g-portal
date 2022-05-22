@@ -1,7 +1,4 @@
 /* Main Issues
-Editing scratch layer
-second click on active header hides submenu
-stop editing cancelWorkflow()
 add zip shp
 effect undo function
 */

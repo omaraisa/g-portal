@@ -34,6 +34,10 @@ export default function Bookmarks({view}) {
   const initAddBookmarkForm = () => {
     setFormVisibility(true);
   };
+
+  
+  /*********************************************/
+  useEffect(() => console.log(state),[state])
   return (
     <div className="flex-column-container" >
       <h1>العلامات المرجعية المرجعية</h1>

@@ -31,10 +31,10 @@ export default function MainMap() {
         const layers = [...map.layers.items];
         updateLayers(layers)
         })
-        var myLayer = new FeatureLayer({
-          url: "https://services6.arcgis.com/nEMEkLg8rZV7Ijyb/ArcGIS/rest/services/SudanMap/FeatureServer/2",
-          });
-          map.add(myLayer);
+        // var myLayer = new FeatureLayer({
+        //   url: "https://services6.arcgis.com/nEMEkLg8rZV7Ijyb/ArcGIS/rest/services/SudanMap/FeatureServer/2",
+        //   });
+        //   map.add(myLayer);
         // var myLayer1 = new FeatureLayer({
         //   url: "https://services6.arcgis.com/nEMEkLg8rZV7Ijyb/ArcGIS/rest/services/SudanMap/FeatureServer/1",
         //   });
