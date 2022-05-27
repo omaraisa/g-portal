@@ -109,7 +109,7 @@ export const symbols = {
     color: "#202020",
     outline: {
       width: 2,
-      color: "#fff",
+      color: "#202020",
     },
   },
 };

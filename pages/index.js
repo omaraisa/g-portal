@@ -1,6 +1,11 @@
 /* Main Issues
+api key
 add zip shp
 effect undo function
+drag and drop 
+download shp 
+download options
+export tab
 */
 import React, { Suspense } from "react";
 import Head from "next/head";

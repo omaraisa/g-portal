@@ -86,12 +86,12 @@ export default function AddUploadedLayer() {
     const maximumSize = maximumAllowedSize[extension]
     const requirements = [
       {
-        condition: layer.size <= maximumSize,
-        errorMessage: `عفواً، أقصى حجم مسموح به هو ${maximumSize/1000000} ميقابايت`,
-      },
-      {
         condition: allowedExtensions.includes(extension),
         errorMessage: "عفواً، الملف المرفوع ليس من ضمن الصيغ المتاحة",
+      },
+      {
+        condition: layer.size <= maximumSize,
+        errorMessage: `عفواً، أقصى حجم مسموح به هو ${maximumSize/1000000} ميقابايت`,
       },
     ];
 
@@ -195,7 +195,7 @@ export default function AddUploadedLayer() {
       <div className="flex-column-container">
         <h3>رفع طبقة </h3>
         <span>
-          xls, xlsx, txt, csv, json, geojson, kml, kmz, zipped Shapefile
+          xls, xlsx, txt, csv, json, geojson, kml, kmz, gpx, zipped Shapefile
         </span>
         {state.layerInfo.fileName && (
           <span>

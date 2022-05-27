@@ -37,7 +37,7 @@ export default function Bookmarks({view}) {
 
   
   /*********************************************/
-  useEffect(() => console.log(state),[state])
+  // useEffect(() => console.log(state),[state])
   return (
     <div className="flex-column-container" >
       <h1>العلامات المرجعية المرجعية</h1>
