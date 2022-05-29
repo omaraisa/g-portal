@@ -5,6 +5,7 @@ import GraphicsLayer from "@arcgis/core/layers/GraphicsLayer";
 import Graphic from "@arcgis/core/Graphic";
 import Sketch from "@arcgis/core/widgets/Sketch";
 import * as geometryEngine from "@arcgis/core/geometry/geometryEngine";
+import * as GIS from "../../modules/gis-module";
 
 let sketchGraphic = new GraphicsLayer({
   title: "طبقة الرسم",
@@ -13,7 +14,7 @@ let sketchGraphic = new GraphicsLayer({
 
 
 export default function SelectFeatures() {
-  const { map, view, layers, sendMessage } = useContext(AppContext);
+  const { map, view, layers, sendMessage, updateTargetLayers, goToSubMenu } = useContext(AppContext);
   const [
     targetLayerRef,
     selectionLayerRef,
@@ -21,8 +22,8 @@ export default function SelectFeatures() {
     relationshipRef,
   ] = [useRef(), useRef(), useRef(), useRef()];
   const defaultState = {
-    targetLayerView: null,
-    selectionLayerView: null,
+    targetLayer: null,
+    selectionLayer: null,
     selectionResultLayer: null,
     resultFeatures: null,
     resultLayerParameters:null,
@@ -51,8 +52,8 @@ export default function SelectFeatures() {
       });
       sketch.on("create", ({ graphic, state }) => {
         if (state === "complete") {
-          runQuery({
-            geometriesAry: [graphic.geometry],
+          runQuery({ 
+            geometry: graphic.geometry,
             spatialRelationship: "intersects",
             state: stateRef.current,
           });
@@ -72,53 +73,70 @@ export default function SelectFeatures() {
   function setTargetLayer(state) {
     const layerIndex = targetLayerRef.current.value;
     const targetLayer = layers[layerIndex];
-    view
-      .whenLayerView(targetLayer)
-      .then((layerView) => setState({ ...state, targetLayerView: layerView }));
+    setState({ ...state, targetLayer })
   }
 
   function setSelectionLayer(state) {
-    const layerIndex = selectionLayerRef.current.value;
-    const selectionLayer = layers[layerIndex];
-    view
-      .whenLayerView(selectionLayer)
-      .then((layerView) =>setState({ ...state, selectionLayerView: layerView }));
-  }
+    try {
+      const layerIndex = selectionLayerRef.current.value;
+      const selectedLayer = layers[layerIndex];
+      selectedLayer.queryFeatures(GIS.allDataQuery).then(function (result) {
 
-  function getQueryResult(geometriesAry, spatialRelationship, state) {
-    return geometriesAry.map((geometry) => {
-      const query = {
-        outFields: ["*"],
-        geometry: geometry,
-        returnGeometry: true,
+        result.features.length
+        ? getSelectionGeometry()
+        : sendErrorMessage("لا توجد معالم في هذه الطبقة");
+
+        function getSelectionGeometry() {
+          const allFeaturesGeometries = result.features.map(
+            (feature) => feature.geometry
+          );
+          const selectionGeometry = geometryEngine.union(allFeaturesGeometries);
+          setState({ ...state, selectionGeometry, selectionLayer:selectedLayer });
+        }
+
+      });
+    } catch (error) {
+      sendErrorMessage("فشل الحصول على بيانات طبقة التحديد");
+      console.log(error);
+    }
+  }
+  
+  function getQueryResult(geometry, spatialRelationship, state) {
+    const query = {
+      outFields: ["*"],
+      geometry: geometry,
+      returnGeometry: true,
         spatialRelationship,
       };
-      return state.targetLayerView
-        .queryFeatures(query)
-        .then((response) => response.features)
+      return state.targetLayer
+      .queryFeatures(query)
+      .then((response) => {
+        console.log("response",response);
+        
+          return response.features})
         .catch((error) => {
           sendErrorMessage("حدث خطأ أثناء البحث الرجاء المحاولة مرة أخرى");
           console.log("Query Error", error);
           return;
         });
-    });
   }
 
-  function runQuery({ geometriesAry, spatialRelationship, state }) {
+  function runQuery({ geometry, spatialRelationship, state }) {
     if(!targetLayerRef.current.value)
     {
       sendErrorMessage("الرجاء إكمال الحقول المطلوبة")
       return
     }
     const resultFeatures = getQueryResult(
-      geometriesAry,
+      geometry,
       spatialRelationship,
       state
     );
+    console.log("resultFeatures",resultFeatures)
     
-    Promise.all(resultFeatures).then((response) => {
+    Promise.all([resultFeatures]).then((response) => {
       const resultFeatures = [].concat(...response);
-
+      console.log(response)
       resultFeatures.length
         ? addQueryResult({ resultFeatures, state: stateRef.current })
         : sendErrorMessage("لا توجد نتيجة لهذا البحث");
@@ -139,7 +157,9 @@ export default function SelectFeatures() {
   }
 
   function addQueryResult({ resultFeatures, state }) {
-    const {title,fields,geometryType,spatialReference,popupTemplate} = state.targetLayerView.layer
+    console.log("state.targetLayer",state.targetLayer)
+    const {title,fields,geometryType,spatialReference,popupTemplate} = state.targetLayer
+    console.log("title,fields,geometryType,spatialReference,popupTemplate",title,fields,geometryType,spatialReference,popupTemplate)
     
     if (state.selectionResultLayer) {
       map.remove(state.selectionResultLayer);
@@ -232,27 +252,9 @@ export default function SelectFeatures() {
   function startSelection(state) {
     // wait for all layerviews to be generated disable search button
     const spatialRelationship = relationshipRef.current.value;
-    const query = {
-      outFields: ["*"],
-      returnGeometry: true,
-      geometry: state.selectionLayerView.layer.fullExtent,
-    };
-
-    state.selectionLayerView
-      .queryFeatures(query)
-      .then(function (response) {
-        const geometriesAry = response.features.map(
-          (feature) => feature.geometry
-        );
-        response.features.length
-          ? runQuery({ geometriesAry, spatialRelationship, state })
-          : sendErrorMessage("لا توجد معالم في هذه الطبقة");
-      })
-      .catch((error) => {
-        sendErrorMessage("حدث خطأ أثناء البحث الرجاء المحاولة مرة أخرى");
-        console.log("Query Error", error);
-      });
-  }
+    
+    runQuery({ geometry:state.selectionGeometry, spatialRelationship, state })
+    }
 
   function stopSelection(state) {
     if (state.selectionResultLayer) {
@@ -292,83 +294,18 @@ export default function SelectFeatures() {
     };
     
     const newSelectionLayer = new FeatureLayer(state.resultLayerParameters);
-    newSelectionLayer.title = state.targetLayerView.layer.title+ "_نسخة معدلة"
+    newSelectionLayer.title = state.targetLayer.title+ "_نسخة معدلة"
     newSelectionLayer.renderer = renderer
     map.layers.add(newSelectionLayer)
   }
 
 
   async function downloadQueryResult(state) {
-    const geometryType = state.selectionResultLayer.geometryType;
-    const features = state.resultFeatures.map((feature) => {
-      const geometryGetter = {
-        point: () => getPointGeom(),
-        polygon: () => getPolygonGeom(),
-        polyline: () => getlineGeom(),
-      };
-
-      function getPointGeom() {
-        return feature.geometry.coordinates
-          ? {
-              coordinates: feature.geometry.coordinates,
-              geometry: "MultiPoint",
-            }
-          : {
-              coordinates: [
-                feature.geometry.longitude,
-                feature.geometry.latitude,
-              ],
-              geometry: "Point",
-            };
-      }
-      function getPolygonGeom() {
-        return {
-          coordinates: feature.geometry.rings,
-          geometry:
-            feature.geometry.rings.length > 1 ? "MultiPolygon" : "Polygon",
-        };
-      }
-
-      function getlineGeom() {
-        return {
-          coordinates: feature.geometry.paths,
-          geometry:
-            feature.geometry.paths.length > 1
-              ? "MultiLineString"
-              : "LineString",
-        };
-      }
-
-      return {
-        type: "Feature",
-        properties: feature.attributes,
-        geometry: {
-          type: geometryGetter[geometryType]().geometry,
-          coordinates: geometryGetter[geometryType]().coordinates,
-        },
-      };
-    });
-
-    const geojsonQueryResult = {
-      type: "FeatureCollection",
-      features: features,
-    };
-
-    const fileName = state.selectionResultLayer.title;
-    const geojson = JSON.stringify(geojsonQueryResult);
-    const blob = new Blob([geojson], { type: "application/json" });
-    const href = URL.createObjectURL(blob);
-    const link = document.createElement("a");
-    link.href = href;
-    link.download = fileName + ".geojson";
-    link.key =
-      Math.floor(new Date().getTime()) + Math.floor(Math.random() * 999);
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
+    updateTargetLayers({ exportingTargetLayer: state.selectionResultLayer });
+    goToSubMenu("ExportManager");
   }
 
-  // useEffect(() => console.log(state), [state]);
+  useEffect(() => console.log(state), [state]);
 
   return (
     <div className="flex-column-container">
@@ -476,7 +413,7 @@ export default function SelectFeatures() {
         <button
           className="button primaryBtn"
           onClick={() => startSelection(state)}
-          disabled= {state.selectionLayerView && state.targetLayerView? false : true}
+          // disabled= {state.selectionLayerView && state.targetLayer? false : true}
         >
           <i className="esri-icon-cursor-marquee"></i>
           &nbsp; بدء التحديد

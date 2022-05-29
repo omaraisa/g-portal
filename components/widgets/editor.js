@@ -29,7 +29,7 @@ export default function EditorComponent({view,sendBackWidget}) {
     <div className="flex-column-container">
     <div className="flex-column-container">
       <button
-        className="button primaryBtn"
+        className="button dangerBtn"
         onClick={() => stopEditing()}
       >
         ايقاف التحرير

@@ -13,6 +13,7 @@ import * as rendererJsonUtils from "@arcgis/core/renderers/support/jsonUtils";
 import Field from "@arcgis/core/layers/support/Field";
 import LabelClass from "@arcgis/core/layers/support/LabelClass";
 import PopupTemplate from "@arcgis/core/PopupTemplate";
+import { FileUploader } from "react-drag-drop-files";
 
 const layerGenerator = [
   {
@@ -38,9 +39,9 @@ const layerGenerator = [
 ];
 
 export default function OpenMap() {
-  const [mapFileRef] = [useRef()];
   const [state, setState] = useState({
-    fileName: "",
+    fileName: null,
+    extension: null,
   });
   const { map, view, widgets, sendMessage } =
     useContext(AppContext);
@@ -96,6 +97,7 @@ export default function OpenMap() {
       }
 
     });
+    setState({fileName:null,extension:null });
   }
   
 
@@ -147,12 +149,13 @@ export default function OpenMap() {
     return error ? error : { condition: true };
   }
 
-  function prepareFile(file) {
-    setState({ ...state, ...file });
+  function prepareFile(file,fileName,extension) {
+    setState({ ...state,fileName,extension, ...file });
   }
 
   function fileChecker(file) {
     if (file) {
+      const fileName = file.name.replace(/\..+$/, "");
       const extension = file.name.split(".").pop();
       var reader = new FileReader();
       reader.readAsText(file);
@@ -161,7 +164,7 @@ export default function OpenMap() {
           var parsedFile = JSON.parse(event.target.result);
           const validationResponse = fileIsValid(parsedFile, extension);
           validationResponse.condition
-            ? prepareFile(parsedFile)
+            ? prepareFile(parsedFile,fileName,extension)
             : sendErrorMessage(validationResponse.errorMessage);
         } catch (error) {
           console.log(error);
@@ -184,32 +187,41 @@ export default function OpenMap() {
   return (
     <div className="flex-column-container">
       <h3>رفع ملف الخريطة</h3>
-      <input
-        type="file"
-        name="mapFile"
-        id="mapFile"
-        className="inputfile"
-        data-multiple-caption="{count} files selected"
-        ref={mapFileRef}
-        onChange={(event) => fileChecker(event.target.files[0])}
-      />
-      <label htmlFor="mapFile">
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          width="20"
-          height="17"
-          viewBox="0 0 20 17"
-        >
-          <path d="M10 0l-5.2 4.9h3.3v5.1h3.8v-5.1h3.3l-5.2-4.9zm9.3 11.5l-3.2-2.1h-2l3.4 2.6h-3.5c-.1 0-.2.1-.2.1l-.8 2.3h-6l-.8-2.2c-.1-.1-.1-.2-.2-.2h-3.6l3.4-2.6h-2l-3.2 2.1c-.4.3-.7 1-.6 1.5l.6 3.1c.1.5.7.9 1.2.9h16.3c.6 0 1.1-.4 1.3-.9l.6-3.1c.1-.5-.2-1.2-.7-1.5z" />
-        </svg>{" "}
-        <span> اختر ملف&hellip;</span>
-      </label>
+
+      {state.fileName && (
+          <span>
+            <b>{`${state.fileName}.${state.extension}`}</b>
+          </span>
+        )}
+
+
+      <FileUploader
+          handleChange={fileChecker}
+          name="file"
+          types={["gpmap"]}
+          multiple={false}
+          label="اضغط أو ألقي الملف"
+          // eslint-disable-next-line react/no-children-prop
+          children={
+            <div className="drag-drop-zone">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="40"
+            height="33"
+            viewBox="0 0 20 17"
+          >
+            <path fill="#2f80ed" d="M10 0l-5.2 4.9h3.3v5.1h3.8v-5.1h3.3l-5.2-4.9zm9.3 11.5l-3.2-2.1h-2l3.4 2.6h-3.5c-.1 0-.2.1-.2.1l-.8 2.3h-6l-.8-2.2c-.1-.1-.1-.2-.2-.2h-3.6l3.4-2.6h-2l-3.2 2.1c-.4.3-.7 1-.6 1.5l.6 3.1c.1.5.7.9 1.2.9h16.3c.6 0 1.1-.4 1.3-.9l.6-3.1c.1-.5-.2-1.2-.7-1.5z" />
+          </svg>
+          <span> اضغط أو ألقي الملف&hellip;</span>
+        </div>
+          }
+        />   
       <button
         className="button successBtn"
         disabled={!state.extent}
         onClick={() => openMap(state)}
       >
-        تحميل
+        فتح الخريطة
       </button>
     </div>
   );

@@ -2,8 +2,10 @@ import { useState, useRef, useContext } from "react";
 import { AppContext } from "../../pages";
 import styles from "../sub_components/loading.module.css";
 import uploadedLayersHandler, {
-  allowedExtensions,maximumAllowedSize
+  allowedExtensions,
+  maximumAllowedSize,
 } from "../../modules/uploaded-layers-handler";
+import { FileUploader } from "react-drag-drop-files";
 
 export default function AddUploadedLayer() {
   const defaultState = {
@@ -20,8 +22,7 @@ export default function AddUploadedLayer() {
     loadingLayer: false,
     XYFormVisible: false,
   };
-  const [uploadInputRef, uploadLayerBtnRef, XFieldRef, YFieldRef] = [
-    useRef(),
+  const [uploadLayerBtnRef, XFieldRef, YFieldRef] = [
     useRef(),
     useRef(),
     useRef(),
@@ -29,7 +30,7 @@ export default function AddUploadedLayer() {
   const [fileSelected, setFileSelected] = useState(null);
   const [state, setState] = useState(defaultState);
   const appContext = useContext(AppContext);
-  const {sendMessage} = appContext;
+  const { sendMessage } = appContext;
 
   function uploadLayer({ state, xField, yField }) {
     const params = {
@@ -83,7 +84,7 @@ export default function AddUploadedLayer() {
   };
 
   const fileIsValid = (layer, extension) => {
-    const maximumSize = maximumAllowedSize[extension]
+    const maximumSize = maximumAllowedSize[extension];
     const requirements = [
       {
         condition: allowedExtensions.includes(extension),
@@ -91,7 +92,9 @@ export default function AddUploadedLayer() {
       },
       {
         condition: layer.size <= maximumSize,
-        errorMessage: `عفواً، أقصى حجم مسموح به هو ${maximumSize/1000000} ميقابايت`,
+        errorMessage: `عفواً، أقصى حجم مسموح به هو ${
+          maximumSize / 1000000
+        } ميقابايت`,
       },
     ];
 
@@ -202,26 +205,29 @@ export default function AddUploadedLayer() {
             <b>{`${state.layerInfo.fileName}.${state.layerInfo.fileType}`}</b>
           </span>
         )}
-        <input
-          type="file"
-          name="file-1[]"
-          id="file-1"
-          className="inputfile inputfile-1"
-          data-multiple-caption="{count} files selected"
-          ref={uploadInputRef}
-          onChange={(event) => layerChecker(event.target.files[0])}
-        />
-        <label htmlFor="file-1">
+       
+        <FileUploader
+          handleChange={layerChecker}
+          name="file"
+          types={allowedExtensions}
+          multiple={false}
+          label="اضغط أو ألقي الملف"
+          fileOrFiles={fileSelected}
+          // eslint-disable-next-line react/no-children-prop
+          children={
+            <div className="drag-drop-zone">
           <svg
             xmlns="http://www.w3.org/2000/svg"
-            width="20"
-            height="17"
+            width="40"
+            height="33"
             viewBox="0 0 20 17"
           >
-            <path d="M10 0l-5.2 4.9h3.3v5.1h3.8v-5.1h3.3l-5.2-4.9zm9.3 11.5l-3.2-2.1h-2l3.4 2.6h-3.5c-.1 0-.2.1-.2.1l-.8 2.3h-6l-.8-2.2c-.1-.1-.1-.2-.2-.2h-3.6l3.4-2.6h-2l-3.2 2.1c-.4.3-.7 1-.6 1.5l.6 3.1c.1.5.7.9 1.2.9h16.3c.6 0 1.1-.4 1.3-.9l.6-3.1c.1-.5-.2-1.2-.7-1.5z" />
-          </svg>{" "}
-          <span> اختر ملف&hellip;</span>
-        </label>
+            <path fill="#2f80ed" d="M10 0l-5.2 4.9h3.3v5.1h3.8v-5.1h3.3l-5.2-4.9zm9.3 11.5l-3.2-2.1h-2l3.4 2.6h-3.5c-.1 0-.2.1-.2.1l-.8 2.3h-6l-.8-2.2c-.1-.1-.1-.2-.2-.2h-3.6l3.4-2.6h-2l-3.2 2.1c-.4.3-.7 1-.6 1.5l.6 3.1c.1.5.7.9 1.2.9h16.3c.6 0 1.1-.4 1.3-.9l.6-3.1c.1-.5-.2-1.2-.7-1.5z" />
+          </svg>
+          <span> اضغط أو ألقي الملف&hellip;</span>
+        </div>
+          }
+        />        
 
         <button
           className="button primaryBtn"

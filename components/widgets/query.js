@@ -12,7 +12,7 @@ export default function Query() {
     insertedQueryValue,
     selectedQueryValue,
   ] = [useRef(), useRef(), useRef(), useRef(), useRef(), useRef()];
-  const { map, view, layers, widgets, sendMessage } = useContext(AppContext);
+  const { map, view, layers, widgets, sendMessage, updateTargetLayers, goToSubMenu} = useContext(AppContext);
   const [state, setState] = useState({
     targetLayer: null,
     queryResultLayer: null,
@@ -198,73 +198,8 @@ export default function Query() {
   }
 
   async function downloadQueryResult(state) {
-    const geometryType = state.targetLayer.geometryType;
-    const features = state.queryResult.map((feature) => {
-      const geometryGetter = {
-        point: () => getPointGeom(),
-        polygon: () => getPolygonGeom(),
-        polyline: () => getlineGeom(),
-      };
-
-      function getPointGeom() {
-        return feature.geometry.coordinates
-          ? {
-              coordinates: feature.geometry.coordinates,
-              geometry: "MultiPoint",
-            }
-          : {
-              coordinates: [
-                feature.geometry.longitude,
-                feature.geometry.latitude,
-              ],
-              geometry: "Point",
-            };
-      }
-      function getPolygonGeom() {
-        return {
-          coordinates: feature.geometry.rings,
-          geometry:
-            feature.geometry.rings.length > 1 ? "MultiPolygon" : "Polygon",
-        };
-      }
-
-      function getlineGeom() {
-        return {
-          coordinates: feature.geometry.paths,
-          geometry:
-            feature.geometry.paths.length > 1
-              ? "MultiLineString"
-              : "LineString",
-        };
-      }
-
-      return {
-        type: "Feature",
-        properties: feature.attributes,
-        geometry: {
-          type: geometryGetter[geometryType]().geometry,
-          coordinates: geometryGetter[geometryType]().coordinates,
-        },
-      };
-    });
-
-    const geojsonQueryResult = {
-      type: "FeatureCollection",
-      features: features,
-    };
-
-    const fileName = state.targetLayer.title;
-    const geojson = JSON.stringify(geojsonQueryResult);
-    const blob = new Blob([geojson], { type: "application/json" });
-    const href = URL.createObjectURL(blob);
-    const link = document.createElement("a");
-    link.href = href;
-    link.download = fileName + ".geojson";
-    link.key =
-      Math.floor(new Date().getTime()) + Math.floor(Math.random() * 999);
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
+    updateTargetLayers({ exportingTargetLayer: state.queryResultLayer });
+    goToSubMenu("ExportManager");
   }
 
   function clearSearch(state) {

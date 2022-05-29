@@ -34,6 +34,7 @@ const PopupManager = React.lazy(() => import('./widgets/popup-manager'))
 const SymbologyManager = React.lazy(() => import('./widgets/symbology-manager'))
 const SaveMap = React.lazy(() => import('./widgets/save-map'))
 const OpenMap = React.lazy(() => import('./widgets/open-map'))
+const ExportManager = React.lazy(() => import('./widgets/export-manager'))
 
 
 const components = {
@@ -65,6 +66,7 @@ const components = {
   SymbologyManager:SymbologyManager,
   SaveMap:SaveMap,
   OpenMap:OpenMap,
+  ExportManager:ExportManager,
   DefaultPane:DefaultPane,
   Bookmarks:Bookmarks,
   Pane4: HTML_ELEMENTS_TEMPLATES,

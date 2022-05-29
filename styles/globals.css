@@ -752,6 +752,21 @@ textarea {
   padding-bottom: 1rem;
 }
 
+.drag-drop-zone {
+  color:var(--primary);
+  display: flex;
+  flex-flow: column nowrap;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  height: 250px;
+  width: 100%;
+  padding: 1rem;
+  border: dashed 2px var(--primary);
+  border-radius: .5rem;
+}
+
+
 .leftBtn {
   text-align: left;
 }

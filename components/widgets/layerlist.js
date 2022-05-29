@@ -35,6 +35,12 @@ const featureOptions = [
       className: "esri-icon-maps",
       id: "symbology",
     },
+    {
+      //title: "Export",
+      title: "تصدير البيانات",
+      className: "esri-icon-download",
+      id: "exportData",
+    },
 ]
 const rasterOptions = []
 
@@ -125,7 +131,10 @@ export default function LayerListComponent({ sendBackWidget }) {
             updateTargetLayers({ FeatureTableLayer: selectedLayer });
             goToBottomPane("FeatureTable");
         }
-        function exportData() {}
+        function exportData() {
+          updateTargetLayers({ exportingTargetLayer: selectedLayer });
+          goToSubMenu("ExportManager");
+        }
         function popup() {
           updateTargetLayers({ popupTargetLayer: selectedLayer });
           goToSubMenu("PopupManager");

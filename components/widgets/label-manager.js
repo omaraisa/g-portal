@@ -281,7 +281,7 @@ export default function LabelManager() {
     suffixRef.current.value = suffix;
   }
 
-  useEffect(() => console.log(state), [state]);
+  // useEffect(() => console.log(state), [state]);
 
   return (
     <div className="flex-column-container">

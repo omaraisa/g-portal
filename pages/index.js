@@ -1,8 +1,6 @@
 /* Main Issues
 api key
-add zip shp
 effect undo function
-drag and drop 
 download shp 
 download options
 export tab
