@@ -7,7 +7,6 @@ import GeoJSONLayer from "@arcgis/core/layers/GeoJSONLayer";
 import KMLLayer from "@arcgis/core/layers/KMLLayer";
 import FeatureLayer from "@arcgis/core/layers/FeatureLayer";
 import MapImageLayer from "@arcgis/core/layers/MapImageLayer";
-import GraphicsLayer from "@arcgis/core/layers/GraphicsLayer";
 import Graphic from "@arcgis/core/Graphic";
 import * as rendererJsonUtils from "@arcgis/core/renderers/support/jsonUtils";
 import Field from "@arcgis/core/layers/support/Field";
@@ -60,6 +59,7 @@ export default function OpenMap() {
           title: layerSource.title,
           renderer: rendererJsonUtils.fromJSON(layerSource.renderer),
           opacity: layerSource.opacity,
+          visible: layerSource.visible,
           geometryType: layerSource.geometryType,
           legendEnabled: layerSource.legendEnabled,
           source: source,
@@ -78,6 +78,7 @@ export default function OpenMap() {
           const newLayer = new constructor.layer({
             url: layerSource.url,
             opacity: layerSource.opacity,
+            visible: layerSource.visible,
             legendEnabled: layerSource.legendEnabled,
           });
           map.add(newLayer);

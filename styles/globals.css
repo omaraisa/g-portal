@@ -450,7 +450,7 @@ input:checked + .switch-lable:after {
 }
 
 .tick-label {
-  width: 2rem;
+  min-width: 2rem;
   height: 2rem;
   background-color: #6d6d6d;
   transform: translateY(-5%);

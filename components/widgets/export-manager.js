@@ -87,9 +87,9 @@ export default function ExportManager() {
     const options = {
       folder: fileName,
       types: {
-          point: 'mypoints',
-          polygon: 'mypolygons',
-          line: 'mylines'
+          point: fileName,
+          polygon: fileName,
+          line: fileName
         }
       }        
     shpwrite.download(state.geojsonFeatures, options);

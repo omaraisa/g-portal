@@ -7,12 +7,13 @@ import Field from "@arcgis/core/layers/support/Field";
 import * as GIS from "./gis-module";
 import * as XLSX from "xlsx";
 import { BlobServiceClient } from "@azure/storage-blob";
-
+import dotenv from 'dotenv'
+dotenv.config();
+const containerName = process.env.NEXT_PUBLIC_ContainerName;
+const sasToken = process.env.NEXT_PUBLIC_SasToken
+const storageAccountName = process.env.NEXT_PUBLIC_StorageAccountName
+const layerscontainer = process.env.NEXT_PUBLIC_Layerscontainer
 const portalUrl = "https://www.arcgis.com";
-const containerName = "layerscontainer";
-const sasToken =
-  "sp=racwl&st=2022-04-15T03:36:05Z&se=2023-05-01T11:36:05Z&spr=https&sv=2020-08-04&sr=c&sig=6SrywdHjgYxen9HMXwi5ZODlRg7z6I2Pjb0VAqNl%2FTc%3D";
-const storageAccountName = "mygportalstorage";
 
 const uploadFileToBlob = async (file, uploadName) => {
   if (!file) return;
@@ -26,7 +27,7 @@ const uploadFileToBlob = async (file, uploadName) => {
     file,
     uploadName
   );
-  const url = `https://mygportalstorage.blob.core.windows.net/layerscontainer/${uploadName}`;
+  const url = layerscontainer + uploadName;
   return url;
 };
 

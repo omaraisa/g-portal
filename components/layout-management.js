@@ -77,7 +77,7 @@ export const LayoutManager = (state,action) => {
 
      function toogleLeftMenu() {
        const newLayout = state.layout.leftPaneMinimized?
-       {...state.layout,...updateMenusProps(["left",(state.layout.middlePaneFlex - 0.2),"◀",0.21,150,500,false,true])}
+       {...state.layout,...updateMenusProps(["left",(state.layout.middlePaneFlex - 0.2),"◀",0.21,250,500,false,true])}
        :
        {...state.layout,...updateMenusProps(["left",(state.layout.middlePaneFlex + state.layout.leftPaneFlex),"▶",0,0,1,true,true])}
        const newState = {...state,layout:newLayout}
@@ -118,7 +118,7 @@ export const LayoutManager = (state,action) => {
     const expandPaneProps = {
           leftPaneArrow: "◀",
           leftPaneFlex: 0.2,
-          leftPaneMinSize: 150,
+          leftPaneMinSize: 250,
           leftPaneMaxSize: 500,
           leftPaneMinimized: false,
           middlePaneFlex: state.layout.middlePaneFlex - 0.2,

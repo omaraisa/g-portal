@@ -2,24 +2,35 @@ import { useState, useRef, useContext, useEffect } from "react";
 import { AppContext } from "../../pages";
 import styles from "./maps-frames.module.css";
 import Map from "@arcgis/core/Map";
+import Graphic from "@arcgis/core/Graphic";
+import FeatureLayer from "@arcgis/core/layers/FeatureLayer";
+import * as GIS from "../../modules/gis-module";
 
-const mapFrames = [
+const initialId = 1001;
+const initialMapFrames = [
   {
     name: "الخريطة الافتراضية",
     map: null,
     extent: null,
-    id: 1001,
+    id: initialId,
   },
 ];
 
 export default function MapFrames() {
-  const { view, map,widgets, sendMessage, sendBackMapView, layers, updateLayers } =
-    useContext(AppContext);
+  const {
+    view,
+    map,
+    widgets,
+    sendMessage,
+    sendBackMapView,
+    layers,
+    updateLayers,
+  } = useContext(AppContext);
   const [state, setState] = useState({
-    activeMapFrameID: 1001,
+    activeMapFrameID: initialId,
     deletionTargetID: null,
     additionDivVisible: false,
-    mapFrames,
+    mapFrames: initialMapFrames,
     mapFramesInitiated: false,
     layersListVisible: true,
     readyToCopyLayers: [],
@@ -43,43 +54,50 @@ export default function MapFrames() {
   }
 
   function addMapFrame(state) {
-    if (!mapFrameName.current.value) {
-      sendMessage({
-        type: "error",
-        title: "إضافة خريطة",
-        body: "الرجاء ادخال البيانات بشكل صحيح",
+    try {
+      if (!mapFrameName.current.value) {
+        sendMessage({
+          type: "error",
+          title: "إضافة خريطة",
+          body: "الرجاء ادخال البيانات بشكل صحيح",
+        });
+        return;
+      }
+      const previousMapFrameID = state.activeMapFrameID;
+      const previousExtent = view.extent;
+      const newMap = new Map({
+        basemap: "osm",
       });
-      return;
+      view.map = newMap;
+      newMap.allLayers.on("change", () => {
+        const layers = [...newMap.layers.items];
+        updateLayers(layers);
+      });
+      sendBackMapView(newMap, view);
+      const newMapFrame = {
+        name: mapFrameName.current.value,
+        map: newMap,
+        extent: previousExtent,
+        id: Math.floor(new Date().getTime()) + Math.floor(Math.random() * 999),
+      };
+      const updatedMapFrames = updateMapFrameExtent(
+        previousMapFrameID,
+        previousExtent,
+        state
+      );
+      const newMapFrames = [...updatedMapFrames, newMapFrame];
+      setState({
+        ...state,
+        activeMapFrameID: newMapFrame.id,
+        mapFrames: newMapFrames,
+        additionDivVisible: false,
+      });
+    } catch (error) {
+      console.log(error);
+      sendErrorMessage(
+        "حدث خطأ أثناء محاولة إضافة خريطة جديدة، الرجاء المحاولة مرة أخرى"
+      );
     }
-    const previousMapFrameID = state.activeMapFrameID;
-    const previousExtent = view.extent;
-    const newMap = new Map({
-      basemap: "osm",
-    });
-    view.map = newMap;
-    newMap.allLayers.on("change", () => {
-      const layers = [...newMap.layers.items];
-      updateLayers(layers);
-    });
-    sendBackMapView(newMap, view);
-    const newMapFrame = {
-      name: mapFrameName.current.value,
-      map: newMap,
-      extent: previousExtent,
-      id: Math.floor(new Date().getTime()) + Math.floor(Math.random() * 999),
-    };
-    const updatedMapFrames = updateMapFrameExtent(
-      previousMapFrameID,
-      previousExtent,
-      state
-    );
-    const newMapFrames = [...updatedMapFrames, newMapFrame];
-    setState({
-      ...state,
-      activeMapFrameID: newMapFrame.id,
-      mapFrames: newMapFrames,
-      additionDivVisible: false,
-    });
   }
 
   function setActiveMapFrame(id, state) {
@@ -96,7 +114,12 @@ export default function MapFrames() {
       previousExtent,
       state
     );
-    setState({ ...state, mapFrames: updatedMapFrames, activeMapFrameID: id,readyToCopyLayers:[] });
+    setState({
+      ...state,
+      mapFrames: updatedMapFrames,
+      activeMapFrameID: id,
+      readyToCopyLayers: [],
+    });
   }
 
   function deleteMapFrame(id, state) {
@@ -185,7 +208,11 @@ export default function MapFrames() {
         (mapFrame) => mapFrame.id === targetMapFrameId
       ).map;
       state.readyToCopyLayers.forEach((layerId) => {
-        const newLayer = map.findLayerById(layerId).clone();
+        const targetLayer = map.findLayerById(layerId);
+        const newLayer = targetLayer.url
+          ? targetLayer.clone()
+          : cloneLayerBySource(targetLayer);
+
         targetMap.add(newLayer);
         widgets["legend"].layerInfos.push({
           layer: newLayer,
@@ -194,6 +221,114 @@ export default function MapFrames() {
       setActiveMapFrame(targetMapFrameId, state);
     } catch (error) {
       sendErrorMessage("عفواً بعض الطبقات المحددة لا يمكن نسخها");
+      console.log(error);
+    }
+  }
+
+  async function cloneLayerBySource(layer) {
+    const layerSource = await extractData(layer);
+    return generateLayer(layerSource);
+  }
+
+  async function extractData(layer) {
+    const layerSource = {
+      id: layer.id,
+      title: layer.title,
+      renderer: layer.renderer,
+      geometryType: layer.geometryType,
+      popupEnabled: layer.popupEnabled,
+      popupTemplate: layer.popupTemplate,
+      opacity: layer.opacity,
+      fields: layer.fields,
+      visible: layer.visible,
+      legendEnabled: layer.legendEnabled,
+      labelsVisible: layer.labelsVisible,
+      labelingInfo: layer.labelingInfo,
+      type: layer.type,
+    };
+    layerSource.layerFeatures = await prepareLayerFeatures(layer);
+    layerSource.sourceIncluded = true;
+    return layerSource;
+  }
+
+  function generateLayer(layerSource) {
+    const source = layerSource.layerFeatures
+    const newLayer = new FeatureLayer({
+      title: layerSource.title,
+      renderer: layerSource.renderer,
+      opacity: layerSource.opacity,
+      visible: layerSource.visible,
+      geometryType: layerSource.geometryType,
+      legendEnabled: layerSource.legendEnabled,
+      source: source,
+    });
+    handleFields(newLayer, layerSource);
+    handlePopupTemplates(newLayer, layerSource);
+    handleLabelingInfo(newLayer, layerSource);
+    return newLayer;
+  }
+
+  async function prepareLayerFeatures(layer) {
+    return new Promise((resolve, reject) => {
+      layer.type === "graphics" ? handleGraphicsLayer() : handleFeatureLayer();
+
+      function handleGraphicsLayer() {
+        resolve(layer.graphics.items);
+      }
+      function handleFeatureLayer() {
+        layer.queryFeatures(GIS.allDataQuery).then(function (result) {
+          if (result.features.length) {
+            const layerFeatures = result.features.map((feature) => {
+              const graphic = new Graphic({
+                geometry: feature.geometry,
+                attributes: feature.attributes,
+              });
+              return graphic;
+            });
+            resolve(layerFeatures);
+          } else reject([]);
+        });
+      }
+    }).catch((error) => {
+      console.log(error);
+      return [];
+    });
+  }
+
+  function handleFields(newLayer, layerSource) {
+    try {
+      if (layerSource.fields) {
+        newLayer.fields = layerSource.fields
+        if (!newLayer.fields.some((field) => field.type === "oid")) {
+          newLayer.fields.unshift({
+            name: "ObjectID",
+            type: "oid",
+          });
+        }
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
+  function handlePopupTemplates(newLayer, layerSource) {
+    try {
+      if (layerSource.popupTemplate) {
+        newLayer.popupTemplate = layerSource.popupTemplate
+        newLayer.popupEnabled = layerSource.popupEnabled;
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
+  function handleLabelingInfo(newLayer, layerSource) {
+    try {
+      if (layerSource.labelingInfo) {
+        newLayer.labelingInfo = layerSource.labelingInfo
+        newLayer.labelsVisible = layerSource.labelsVisible;
+      }
+    } catch (error) {
       console.log(error);
     }
   }

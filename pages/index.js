@@ -1,9 +1,13 @@
 /* Main Issues
-api key
 effect undo function
-download shp 
-download options
-export tab
+empty azure storage from old data
+comment all loose console.log
+action when no internet connection
+symbology without fields
+enter key activate the target button
+edit attribute table 
+notification when uploading shp.zip not to have multiple folders
+move all static url and keys to env
 */
 import React, { Suspense } from "react";
 import Head from "next/head";

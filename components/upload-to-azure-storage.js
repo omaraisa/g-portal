@@ -4,9 +4,7 @@ import intoStream from 'into-stream';
 import dotenv from 'dotenv';
 dotenv.config();
 
-// const AZURE_STORAGE_CONNECTION_STRING = process.env.AZURE_STORAGE_CONNECTION_STRING;
-const AZURE_STORAGE_CONNECTION_STRING = "DefaultEndpointsProtocol=https;AccountName=mygportalstorage;AccountKey=YN69vZV3+29/kOO7CtrPqRUiA/vLtu33D0nviV//cl45cxW8GdYHY6zfTYqF26nvB7jjIe3CzN3Q+AStJYb8oQ==;EndpointSuffix=core.windows.net"
-
+const CONNECTION_STRING = process.env.NEXT_PUBLIC_AZURE_STORAGE_CONNECTION_STRING;
 
 export const config = {
     api: {
@@ -21,12 +19,11 @@ export default async function uploadToAzureStorage (request, response) {
     }
     const containerName = "layerscontainer";
     const blobService = azureStorage.createBlobService(
-        AZURE_STORAGE_CONNECTION_STRING
+        CONNECTION_STRING
     );
     const blobName = request.files[0].filename;
     // console.log(`Blob Name ${blobName}`);
     const stream = intoStream(request.files[0].path);
-    console.log(`stream ${stream}`);
     const streamLength = request.files[0].size;
     // console.log(`Length ${streamLength}`);
     blobService.createBlockBlobFromStream(

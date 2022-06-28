@@ -6,19 +6,29 @@ import { AppContext } from "../pages";
 import FeatureLayer from "@arcgis/core/layers/FeatureLayer";
 import GeoJSONLayer from "@arcgis/core/layers/GeoJSONLayer";
 import CSVLayer from "@arcgis/core/layers/CSVLayer";
+import esriConfig from "@arcgis/core/config";
+import dotenv from 'dotenv'
+dotenv.config();
+const ArcGISAPIKey = process.env.NEXT_PUBLIC_ArcGISAPIKey;
+
 let map,view
 export default function MainMap() {
   const { sendMessage, sendBackMapView, updateLayers } = useContext(AppContext);
   const mapRef = useRef();
   useEffect(() => {
+    // const esriConfig = {
+    //   apiKey : ArcGISAPIKey
+    // };
+    esriConfig.apiKey =ArcGISAPIKey
+
     map = new Map({ 
       basemap: "topo-vector"
     });
     view = new MapView({
-      zoom:6,
-      center: [32,15],
+      zoom:3,
+      center: [15,0],
       ui : {
-          components : ["zoom","compass","ScaleBar"]
+          components : ["zoom"]
       }});
     view.map = map;
     view.container = mapRef.current;
@@ -28,7 +38,7 @@ export default function MainMap() {
       })
       .then((_) => {
         map.allLayers.on("change", () => {
-        const layers = [...map.layers.items];
+        const layers = map.layers.items.filter(layer=> layer.type !== "graphics");
         updateLayers(layers)
         })
         // var myLayer = new FeatureLayer({

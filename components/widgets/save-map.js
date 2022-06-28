@@ -55,6 +55,7 @@ export default function SaveMap() {
         popupTemplate: layer.popupTemplate,
         opacity: layer.opacity,
         fields: layer.fields,
+        visible: layer.visible,
         legendEnabled: layer.legendEnabled,
         labelsVisible: layer.labelsVisible,
         labelingInfo: layer.labelingInfo,
