@@ -20,7 +20,7 @@ export default function MainMap() {
     //   apiKey : ArcGISAPIKey
     // };
     esriConfig.apiKey =ArcGISAPIKey
-
+    console.log(esriConfig.apiKey)
     map = new Map({ 
       basemap: "topo-vector"
     });
