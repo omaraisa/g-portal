@@ -16,13 +16,10 @@ export default function MainMap() {
   const { sendMessage, sendBackMapView, updateLayers } = useContext(AppContext);
   const mapRef = useRef();
   useEffect(() => {
-    // const esriConfig = {
-    //   apiKey : ArcGISAPIKey
-    // };
     esriConfig.apiKey =ArcGISAPIKey
-    console.log(esriConfig.apiKey)
+
     map = new Map({ 
-      basemap: "topo-vector"
+      basemap: "arcgis-topographic"
     });
     view = new MapView({
       zoom:3,

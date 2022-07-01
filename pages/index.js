@@ -123,7 +123,7 @@ export default function Home() {
 
 
   /*********************************************/
-  useEffect(() => console.log(state),[state])
+  // useEffect(() => console.log(state),[state])
 
 
   return (
