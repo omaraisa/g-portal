@@ -64,8 +64,7 @@ const uploadedLayersHandler = async ({
       zip: () => zipShpLayerHandler(),
       preparedLayer: () => addXYLayer(),
     };
-    
-    let XYFeatures = [];  
+    let XYFeatures = layerInfo.XYFeatures? layerInfo.XYFeatures :[];  
     const params = {
       name: fileName,
       targetSR: view.spatialReference,
@@ -166,7 +165,7 @@ const uploadedLayersHandler = async ({
         XYFeatures = await processXYData(e.target.result);
         if (await XYFeatures) {
           const XYColumns = Object.keys(await XYFeatures[0]);
-          toggleXYForm(XYColumns);
+          toggleXYForm(XYColumns,XYFeatures);
         } else {
           sendMessage({
             type: "error",
@@ -175,8 +174,6 @@ const uploadedLayersHandler = async ({
           });
         }
       };
-
-      // return new GeoJSONLayer({url: uploadedFile,title:fileName});
     }
 
     async function addXYLayer() {

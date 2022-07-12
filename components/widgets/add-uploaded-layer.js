@@ -152,13 +152,14 @@ export default function AddUploadedLayer() {
     });
   }
 
-  function toggleXYForm(fieldsNames) {
+  function toggleXYForm(fieldsNames,XYFeatures) {
     setState({
       ...state,
       layerInfo: {
         ...state.layerInfo,
         XYColumns: fieldsNames,
         fileType: "preparedLayer",
+        XYFeatures
       },
       XYFormVisible: true,
     });
