@@ -4,7 +4,7 @@ import Graphic from "@arcgis/core/Graphic";
 import * as GIS from "../../modules/gis-module";
 
 export default function SaveMap() {
-  const [fileNameRef] = [useRef(),];
+  const [fileNameRef,saveMapBtn] = [useRef(),useRef()];
   const [state, setState] = useState({
     fileName: "",
   });
@@ -12,12 +12,13 @@ export default function SaveMap() {
     useContext(AppContext);
 
   function saveMap(state) {
-    mapDefinition.extent = view.extent;
-    mapDefinition.basemap = map.basemap;
     mapDefinition.Source= "GPortal Map"
     mapDefinition.Developer="gis-gate.com"
     mapDefinition.CopyRights= "GPortal"
+    mapDefinition.Version= 1.0
     mapDefinition.Usage="This file has been exported from a Gportal Map. It can be used by importing it to the platform"
+    mapDefinition.extent = view.extent;
+    mapDefinition.basemap = map.basemap;
     const layerSources = generateLayerSources();
 
     Promise.all(layerSources).then((response) => {
@@ -100,6 +101,22 @@ export default function SaveMap() {
     });
   }
 
+  
+  
+  useEffect(() => {
+    const keyDownHandler = event => {
+      if (event.key === 'Enter') {
+        event.preventDefault();
+        saveMapBtn.current.click();
+      }
+    };
+    document.addEventListener('keydown', keyDownHandler);
+    return () => {
+      document.removeEventListener('keydown', keyDownHandler);
+    };
+  }, []);
+
+
   // useEffect(() => console.log(state), [state]);
 
   return (
@@ -122,6 +139,7 @@ export default function SaveMap() {
       <button
         className="button successBtn"
         disabled={state.fileName === ""}
+        ref={saveMapBtn}
         onClick={() => saveMap(state)}
       >
         حفظ ملف الخريطة

@@ -1,4 +1,4 @@
-import { useState, useRef, useContext } from "react";
+import { useState, useRef, useContext, useEffect } from "react";
 import { AppContext } from "../../pages";
 import FeatureLayer from "@arcgis/core/layers/FeatureLayer";
 import MapImageLayer from "@arcgis/core/layers/MapImageLayer";
@@ -98,17 +98,20 @@ export default function AddMapService() {
   };
 
   const urlChecker = () => {
-    loading(true);
-    fetch(urlRef.current.value)
-      .then(() => addMapService[layerTypeRef.current.value]())
-      .catch((e) => {
-        loading(false);
-        sendMessage({
-          type: "error",
-          title: "إضافة طبقة",
-          body: `عفواً، الرابط غير صحيح`,
+    if(urlRef.current.value !== '')
+    {
+      loading(true);
+      fetch(urlRef.current.value)
+        .then(() => addMapService[layerTypeRef.current.value]())
+        .catch((e) => {
+          loading(false);
+          sendMessage({
+            type: "error",
+            title: "إضافة طبقة",
+            body: `عفواً، الرابط غير صحيح`,
+          });
         });
-      });
+    }
   };
 
   const loading = (status) => {
@@ -119,6 +122,25 @@ export default function AddMapService() {
       addLayerBtnDisabled: status,
     });
   };
+
+
+  
+  
+  useEffect(() => {
+    const keyDownHandler = event => {
+      if (event.key === 'Enter') {
+        event.preventDefault();
+        urlChecker()
+      }
+    };
+    document.addEventListener('keydown', keyDownHandler);
+    return () => {
+      document.removeEventListener('keydown', keyDownHandler);
+    };
+  }, []);
+
+
+
   return (
     <div className="flex-column-container">
       <h3>إضافة طبقة جديدة</h3>

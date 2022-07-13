@@ -107,7 +107,7 @@ export default function HTML_ELEMENTS_TEMPLATES(props) {
         className="inputText"
         type="text"
         id="plainInput"
-        onChange={() => console.log("fired")}
+        //onChange={() => console.log("fired")}
       ></input>
 
       <textarea name="" id="" cols="30" rows="3"></textarea>

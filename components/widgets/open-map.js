@@ -44,7 +44,7 @@ export default function OpenMap() {
   });
   const { map, view, widgets, sendMessage } =
     useContext(AppContext);
-
+  const openMapBtn = useRef();
   function openMap({ basemap, extent, layerSources }) {
     map.removeAll();
     view.graphics.removeAll();
@@ -183,6 +183,21 @@ export default function OpenMap() {
     });
   }
 
+   
+  useEffect(() => {
+    const keyDownHandler = event => {
+      if (event.key === 'Enter') {
+        event.preventDefault();
+        openMapBtn.current.click()
+      }
+    };
+    document.addEventListener('keydown', keyDownHandler);
+    return () => {
+      document.removeEventListener('keydown', keyDownHandler);
+    };
+  }, []);
+
+
   // useEffect(() => console.log(state), [state]);
 
   return (
@@ -220,6 +235,7 @@ export default function OpenMap() {
       <button
         className="button successBtn"
         disabled={!state.extent}
+        ref={openMapBtn}
         onClick={() => openMap(state)}
       >
         فتح الخريطة

@@ -110,9 +110,7 @@ export default function SelectFeatures() {
       };
       return state.targetLayer
       .queryFeatures(query)
-      .then((response) => {
-        console.log("response",response);
-        
+      .then((response) => {        
           return response.features})
         .catch((error) => {
           sendErrorMessage("حدث خطأ أثناء البحث الرجاء المحاولة مرة أخرى");
@@ -132,11 +130,9 @@ export default function SelectFeatures() {
       spatialRelationship,
       state
     );
-    console.log("resultFeatures",resultFeatures)
     
     Promise.all([resultFeatures]).then((response) => {
       const resultFeatures = [].concat(...response);
-      console.log(response)
       resultFeatures.length
         ? addQueryResult({ resultFeatures, state: stateRef.current })
         : sendErrorMessage("لا توجد نتيجة لهذا البحث");
@@ -157,9 +153,7 @@ export default function SelectFeatures() {
   }
 
   function addQueryResult({ resultFeatures, state }) {
-    console.log("state.targetLayer",state.targetLayer)
     const {title,fields,geometryType,spatialReference,popupTemplate} = state.targetLayer
-    console.log("title,fields,geometryType,spatialReference,popupTemplate",title,fields,geometryType,spatialReference,popupTemplate)
     
     if (state.selectionResultLayer) {
       map.remove(state.selectionResultLayer);
@@ -305,7 +299,7 @@ export default function SelectFeatures() {
     goToSubMenu("ExportManager");
   }
 
-  useEffect(() => console.log(state), [state]);
+  // useEffect(() => console.log(state), [state]);
 
   return (
     <div className="flex-column-container">

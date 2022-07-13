@@ -71,16 +71,18 @@ export default function SymbologyManager() {
   stateRef.current = state;
 
   useEffect(() => {
+    
     const targetLayer = targetLayers.symbologyTargetLayer;
     if (targetLayer) {
       try {
         const previousLayerSymbology = { ...state.currentSymbology };
         state.layersSymbology.find(
           (symbology) => symbology.layerID === targetLayer.id
-        )
+          )
           ? setTargetLayer(targetLayer, previousLayerSymbology, state)
           : addNewSymbology(targetLayer, previousLayerSymbology, state);
-        layerSelectorRef.current.value = targetLayer.id;
+          layerSelectorRef.current.value = targetLayer.id;
+          rendererTypeRef.current.value = ""
       } catch (error) {
         sendErrorMessage(
           "عفواً حدث خطأ أثناء معالجة معلومات الطبقة، الرجاء المحاولة مرة أخرى"
@@ -123,6 +125,11 @@ export default function SymbologyManager() {
      }
     );
     }
+    return () => {
+      updateTargetLayers({
+        symbologyTargetLayer: {},
+      })
+  }
   }, []);
 
   
@@ -165,10 +172,13 @@ export default function SymbologyManager() {
   }
 
   function addNewSymbology(targetLayer, previousLayerSymbology, state) {
-    const fields = targetLayer.fields.map((field) => ({
+    const fields = 
+    targetLayer.fields?
+    targetLayer.fields.map((field) => ({
       name: field.name,
       type: field.type,
-    }));
+    }))
+    : []
 
     const newLayerSymbology = {
       layerID: targetLayer.id,
@@ -342,7 +352,7 @@ export default function SymbologyManager() {
           className="select"
           defaultValue=""
           ref = {rendererTypeRef}
-          disabled={state.currentSymbology.symbologyField ? false : true}
+          // disabled={state.currentSymbology.symbologyField ? false : true}
           onChange={(event) =>
             updateSymbologyProps({
               property: "rendererType",
@@ -353,15 +363,22 @@ export default function SymbologyManager() {
           <option value="" hidden>
             اختر
           </option>
-          {state.currentSymbology.numericalSymbology
+          <option value="simple" >
+            تمثيل بسيط
+          </option>
+          {
+          
+          state.currentSymbology.numericalSymbology
             ? numericalRenderers.map((symbologyType, index) => {
-                return (
-                  <option key={index} value={Object.keys(symbologyType)[0]}>
+              if(state.currentSymbology.symbologyField)
+              return (
+                <option key={index} value={Object.keys(symbologyType)[0]}>
                     {Object.values(symbologyType)[0]}
                   </option>
                 );
               })
-            : textualRenderers.map((symbologyType, index) => {
+              : textualRenderers.map((symbologyType, index) => {
+              if(state.currentSymbology.symbologyField)
                 return (
                   <option key={index} value={Object.keys(symbologyType)[0]}>
                     {Object.values(symbologyType)[0]}

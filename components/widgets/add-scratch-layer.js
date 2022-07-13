@@ -1,4 +1,4 @@
-import React, { useState, useRef, useContext } from "react";
+import React, { useState, useRef, useContext, useEffect } from "react";
 import { AppContext } from "../../pages";
 import FeatureLayer from "@arcgis/core/layers/FeatureLayer";
 import ScratchLayerField from "../sub_components/scratch-layer-field";
@@ -125,6 +125,22 @@ export default function AddScratchLayer() {
     }
     return false;
   };
+
+  
+  
+  useEffect(() => {
+    const keyDownHandler = event => {
+      if (event.key === 'Enter') {
+        event.preventDefault();
+        addScratchLayer()
+      }
+    };
+    document.addEventListener('keydown', keyDownHandler);
+    return () => {
+      document.removeEventListener('keydown', keyDownHandler);
+    };
+  }, []);
+
 
   return (
     <div className="flex-column-container">

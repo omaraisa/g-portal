@@ -14,6 +14,7 @@ export const defaultLayout = {
   mapPaneFlex:1,
   bottomPaneFlex:0,
   bottomPaneArrow:"▲",
+  bottomPaneMinSize: 0,
   bottomPaneMaxSize: 1,
   bottomPaneMinimized: true,
   animationOn: false,
@@ -56,8 +57,8 @@ export const LayoutManager = (state,action) => {
     updatedMenuProps[`animationOn`] = animationOn
     return updatedMenuProps
   }
-   const updateMiddlePaneProps = (mapPaneFlex,bottomPaneFlex,bottomPaneMaxSize,bottomPaneArrow,bottomPaneMinimized) => {
-    return {mapPaneFlex,bottomPaneFlex,bottomPaneMaxSize,bottomPaneArrow,bottomPaneMinimized}
+   const updateMiddlePaneProps = (mapPaneFlex,bottomPaneFlex,bottomPaneMaxSize,bottomPaneMinSize,bottomPaneArrow,bottomPaneMinimized) => {
+    return {mapPaneFlex,bottomPaneFlex,bottomPaneMaxSize,bottomPaneMinSize,bottomPaneArrow,bottomPaneMinimized}
   }
 
    const toggleMenus = (state,{side})  =>  {
@@ -86,9 +87,9 @@ export const LayoutManager = (state,action) => {
       
       function toogleBottomMenu() {
        const newLayout = state.layout.bottomPaneMinimized?
-       {...state.layout,...updateMiddlePaneProps(0.6,0.4,2000,"▼",false)}
+       {...state.layout,...updateMiddlePaneProps(0.6,0.4,2000,50,"▼",false)}
        :
-       {...state.layout,...updateMiddlePaneProps(1,0,1,"▲",true)}
+       {...state.layout,...updateMiddlePaneProps(1,0,1,0,"▲",true)}
        const newState = {...state,layout:newLayout}
        return newState
       }

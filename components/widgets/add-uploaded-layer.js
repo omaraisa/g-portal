@@ -1,4 +1,4 @@
-import { useState, useRef, useContext } from "react";
+import { useState, useRef, useContext, useEffect } from "react";
 import { AppContext } from "../../pages";
 import styles from "../sub_components/loading.module.css";
 import uploadedLayersHandler, {
@@ -22,7 +22,7 @@ export default function AddUploadedLayer() {
     loadingLayer: false,
     XYFormVisible: false,
   };
-  const [uploadLayerBtnRef, XFieldRef, YFieldRef] = [
+  const [XFieldRef, YFieldRef,uploadBtn] = [
     useRef(),
     useRef(),
     useRef(),
@@ -194,6 +194,21 @@ export default function AddUploadedLayer() {
     });
   }
 
+   
+  useEffect(() => {
+    const keyDownHandler = event => {
+      if (event.key === 'Enter') {
+        event.preventDefault();
+        uploadBtn.current.click()
+      }
+    };
+    document.addEventListener('keydown', keyDownHandler);
+    return () => {
+      document.removeEventListener('keydown', keyDownHandler);
+    };
+  }, []);
+
+
   if (!state.XYFormVisible) {
     return (
       <div className="flex-column-container">
@@ -232,8 +247,8 @@ export default function AddUploadedLayer() {
 
         <button
           className="button primaryBtn"
-          ref={uploadLayerBtnRef}
           disabled={state.addLayerBtnDisabled}
+          ref={uploadBtn}
           onClick={() => addUploadedLayer()}
         >
           رفع الطبقة

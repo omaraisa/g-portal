@@ -4,7 +4,6 @@ import intoStream from 'into-stream';
 
 
 export default async function uploadToAzureStorage (request, response,AZURE_STORAGE_CONNECTION_STRING) {
-    console.log(request)
     if (!request.files) {
         return response.status(400).send("No files are received.");
     }

@@ -231,6 +231,7 @@ export default function Home() {
               transition: state.layout.animationOn ? "0.5s ease-in" : "none",
             }}
             maxSize={state.layout.bottomPaneMaxSize}
+            minSize={state.layout.bottomPaneMinSize}
           >
              <BottomPane
               currentComponent={state.layout.bottomPaneCurrentComponent}

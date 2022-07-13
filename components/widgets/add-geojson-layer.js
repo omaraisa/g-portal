@@ -1,4 +1,4 @@
-import { useState, useRef, useContext } from "react";
+import { useState, useRef, useContext, useEffect } from "react";
 import { AppContext } from "../../pages";
 import GeoJSONLayer from "@arcgis/core/layers/GeoJSONLayer";
 import styles from "../sub_components/loading.module.css";
@@ -67,6 +67,8 @@ export default function AddGeoJSONLayer() {
   }
 
   const urlChecker = (url) => {
+    if(urlRef.current.value !== '')
+    {
     loading(true)
       fetch(url)
       .then(() => addGeoJSONLayer(url))
@@ -79,6 +81,22 @@ export default function AddGeoJSONLayer() {
         });
       });
     };
+    };
+
+    
+  
+  useEffect(() => {
+    const keyDownHandler = event => {
+      if (event.key === 'Enter') {
+        event.preventDefault();
+        urlChecker(urlRef.current.value)
+      }
+    };
+    document.addEventListener('keydown', keyDownHandler);
+    return () => {
+      document.removeEventListener('keydown', keyDownHandler);
+    };
+  }, []);
 
   
   return (

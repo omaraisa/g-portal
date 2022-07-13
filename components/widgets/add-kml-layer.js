@@ -1,4 +1,4 @@
-import { useState, useRef, useContext } from "react";
+import { useState, useRef, useContext, useEffect } from "react";
 import { AppContext } from "../../pages";
 import KMLLayer from "@arcgis/core/layers/KMLLayer";
 import styles from "../sub_components/loading.module.css";
@@ -74,6 +74,21 @@ export default function AddKMLLayer() {
   };
 
   
+  
+  useEffect(() => {
+    const keyDownHandler = event => {
+      if (event.key === 'Enter') {
+        event.preventDefault();
+        urlChecker(urlRef.current.value)
+      }
+    };
+    document.addEventListener('keydown', keyDownHandler);
+    return () => {
+      document.removeEventListener('keydown', keyDownHandler);
+    };
+  }, []);
+
+
   return (
     <div className="flex-column-container">
       <h3>إضافة طبقة KML</h3>
