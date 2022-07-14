@@ -13,6 +13,22 @@ const defaultLabelProps = {
   suffix: "",
   prefix: "",
 };
+const defaultLabelingInfo = [
+  {
+    type: "label",
+    labelExpression: null,
+    labelExpressionInfo: null,
+    symbol: {
+      type: "text",
+      color: "#000000",
+      font: {
+        size: 10,
+      },
+    },
+    haloColor: "#ffffff",
+    haloSize: 2,
+  },
+];
 
 export default function LabelManager() {
   const { map, layers, targetLayers, updateTargetLayers, sendMessage } =
@@ -168,32 +184,34 @@ export default function LabelManager() {
     previousLabelProps,
     state
   ) {
-    const labelingInfo = [
-      {
-        type: "label",
-        labelExpression: null,
-        labelExpressionInfo: null,
-        symbol: {
-          type: "text",
-          color: "#000000",
-          font: {
-            size: 10,
-          },
-        },
-        haloColor: "#ffffff",
-        haloSize: 2,
-      },
-    ];
-
-    targetLayer.labelingInfo = [...labelingInfo];
-    targetLayer.labelsVisible = false;
-    const newLabelInfo = {
-      layerID: targetLayer.id,
-      labelProps: { ...defaultLabelProps },
-    };
+    let currentLabelProps={},layersLabel=[];
     const updatedLayersLabel = getUpdatedLayersLabel(previousLabelProps, state);
-    const layersLabel = [...updatedLayersLabel, newLabelInfo];
-    const currentLabelProps = { ...defaultLabelProps };
+
+    targetLayer.labeled
+    ?fetchLabelProps()
+    :addNewLabelProps()
+
+    function fetchLabelProps() {
+      const newLabelingProps = {
+        layerID: targetLayer.id,
+        labelProps: { ...targetLayer.labelProps },
+      };
+      layersLabel = [...updatedLayersLabel, newLabelingProps];
+      currentLabelProps = { ...targetLayer.labelProps };
+    }
+    function addNewLabelProps() {
+      targetLayer.labelingInfo = [...defaultLabelingInfo];
+      targetLayer.labelsVisible = false;
+      const newLabelingProps = {
+        layerID: targetLayer.id,
+        labelProps: { ...defaultLabelProps },
+      };
+      layersLabel = [...updatedLayersLabel, newLabelingProps];
+      currentLabelProps = { ...defaultLabelProps };
+      targetLayer.labeled = true;
+      targetLayer.labelProps = {...defaultLabelProps};
+    }
+
     changeInputsValues(currentLabelProps);
     setState({
       ...state,
@@ -257,6 +275,8 @@ export default function LabelManager() {
     layerLabelProps[property]();
     const currentLabelProps = { ...state.currentLabelProps };
     currentLabelProps[property] = newValue;
+    state.targetLayer.labeled = true;
+    state.targetLayer.labelProps = {...currentLabelProps};
     setState({ ...state, currentLabelProps });
 
     } catch (error) {
