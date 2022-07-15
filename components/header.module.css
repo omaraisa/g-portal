@@ -13,6 +13,11 @@
 }
 
 .title {
+  margin-left: 10px;
+  margin-right: 10px;
+}
+
+.subTitle {
   margin-left: auto;
   margin-right: 10px;
 }

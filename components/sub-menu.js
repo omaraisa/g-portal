@@ -10,6 +10,7 @@ import AddGeoJSONLayer from "./widgets/add-geojson-layer";
 import AddUploadedLayer from "./widgets/add-uploaded-layer";
 import Bookmarks from "./widgets/bookmarks";
 import GPortalInfo from "./widgets/gportal-info";
+import Feedback from "./widgets/feedback";
 // import Print from "../components/widgets/print";
 import HTML_ELEMENTS_TEMPLATES from "./HTML_ELEMENTS_TEMPLATES";
 import React, { Suspense } from "react";
@@ -71,6 +72,7 @@ const components = {
   Bookmarks:Bookmarks,
   Pane4: HTML_ELEMENTS_TEMPLATES,
   GPortalInfo:GPortalInfo,
+  Feedback:Feedback,
 };
 const subMenuPreviousComponents = {
   Pane3: "Pane2",

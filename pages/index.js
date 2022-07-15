@@ -119,7 +119,7 @@ export default function Home() {
     <AppContext.Provider value={{...state,sendMessage,goToSubMenu,goToBottomPane,updateLayers,updateLayerSources,updateTargetLayers,sendBackMapView}}>
     <div className="app" content={"abc"}>
       <Head>
-        <title>جي بورتال</title>
+        <title>جي بورتال | نسخة تجريبية</title>
         <meta name="description" content="منصة جي بورتال" />
         <link rel="icon" href="/favicon.png" />
       </Head>

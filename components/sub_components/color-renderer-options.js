@@ -270,7 +270,8 @@ export default function ColorRendererOptions({
       >
         {GIS.listSymbolStyles(targetLayer.geometryType)}
       </select>
-
+      {targetLayer.geometryType !== "polyline" && (
+        <div className="flex-column-container">
       <label htmlFor="outlineColor">تغيير لون الاطار</label>
       <input
         id="outlineColor"
@@ -282,6 +283,9 @@ export default function ColorRendererOptions({
           })
         }
       ></input>
+       </div>
+      )}
+      
       <div
         className="flex-column-container"
         style={{ marginTop: "2rem", gap: "4rem" }}

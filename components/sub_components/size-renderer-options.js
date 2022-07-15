@@ -242,6 +242,8 @@ export default function SizeRendererOptions({
         }
       ></input>
 
+      {targetLayer.geometryType !== "polygon" && (
+         <div className="flex-column-container">
       <label htmlFor="symbolStyle">اختر الرمز </label>
       <select
         id="symbolStyle"
@@ -255,6 +257,8 @@ export default function SizeRendererOptions({
       >
         {GIS.listSymbolStyles(targetLayer.geometryType)}
       </select>
+      </div>
+      )}
 
       <label htmlFor="outlineColor">تغيير اللون</label>
       <input
@@ -267,6 +271,8 @@ export default function SizeRendererOptions({
           })
         }
       ></input>
+      {targetLayer.geometryType !== "polyline" && (
+        <div className="flex-column-container">
       <label htmlFor="outlineColor">تغيير لون الاطار</label>
       <input
         id="outlineColor"
@@ -278,14 +284,15 @@ export default function SizeRendererOptions({
           })
         }
       ></input>
+       </div>
+      )}
       <div
         className="flex-column-container"
         style={{ marginTop: "2rem", gap: "4rem" }}
       >
-        حجم الاطار
-        
         {targetLayer.geometryType !== "polyline" && (
           <div className="flex-column-container">
+            حجم الاطار
             <div ref={outlineSizeSliderDiv}></div>
           </div>
         )}

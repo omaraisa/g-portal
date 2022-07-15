@@ -6,7 +6,7 @@ export default function Header(props) {
   return (
     <div className={styles.header}>
       <Image src="/images/wlogo.png" alt="me" width="40" height="40" />
-      <h1 className={styles.title}>جي بورتال</h1>
+      <h1 className={styles.title}>جي بورتال</h1> <h3 className={styles.subTitle}> | نسخة تجريبية </h3>
       <NavButton
         toolTip="تحديد المعالم"
         iconClass="esri-icon-cursor-marquee"
@@ -54,6 +54,12 @@ export default function Header(props) {
         iconClass="esri-icon-description"
         activeNav={props.activeSubMenu === "GPortalInfo" ? true : false}
         goTo={() => props.goTo(props.activeSubMenu === "GPortalInfo" ? "DefaultPane" :"GPortalInfo")}
+      />
+      <NavButton
+        toolTip="الملاحظات والمقترحات"
+        iconClass="fas fa-bug"
+        activeNav={props.activeSubMenu === "Feedback" ? true : false}
+        goTo={() => props.goTo(props.activeSubMenu === "Feedback" ? "DefaultPane" :"Feedback")}
       />
     </div>
   );

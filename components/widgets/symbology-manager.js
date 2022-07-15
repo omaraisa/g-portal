@@ -37,12 +37,16 @@ const symbologyTypeGetter = {
   integer: "numerical",
   double: "numerical",
 };
-const textualRenderers = [{ simple: "تمثيل بسيط" }, { unique: "تمثيل فريد" }];
+const textualRenderers = [{ unique: "تمثيل فريد" }];
 const numericalRenderers = [
   { color: "تمثيل باللون" },
   { size: "تمثيل بالحجم" },
+  { unique: "تمثيل فريد" },
+];
+const numericalPointRenderers = [
+  { color: "تمثيل باللون" },
+  { size: "تمثيل بالحجم" },
   { heatmap: "تمثيل حراري" },
-  { simple: "تمثيل بسيط" },
   { unique: "تمثيل فريد" },
 ];
 export default function SymbologyManager() {
@@ -369,7 +373,19 @@ export default function SymbologyManager() {
           {
           
           state.currentSymbology.numericalSymbology
-            ? numericalRenderers.map((symbologyType, index) => {
+            ? 
+            state.targetLayer.geometryType === "point"
+            ?
+            numericalPointRenderers.map((symbologyType, index) => {
+              if(state.currentSymbology.symbologyField)
+              return (
+                <option key={index} value={Object.keys(symbologyType)[0]}>
+                    {Object.values(symbologyType)[0]}
+                  </option>
+                );
+              })
+              :
+            numericalRenderers.map((symbologyType, index) => {
               if(state.currentSymbology.symbologyField)
               return (
                 <option key={index} value={Object.keys(symbologyType)[0]}>
